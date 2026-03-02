@@ -1,0 +1,628 @@
+{
+  "last_node_id": 16,
+  "last_link_id": 22,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "CheckpointLoaderSimple",
+      "pos": [0, 200],
+      "size": {"0": 315, "1": 98},
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [1],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [2, 3, 4, 5],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [6],
+          "shape": 3,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "sd_xl_1.0.safetensors"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CLIPTextEncode",
+      "pos": [400, 0],
+      "size": {"0": 420, "1": 164},
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [7],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "comic book style, manga art, three panel comic strip layout, colorful, clean ink lines, cute anime girl character Kira with short pink hair and green eyes, weather presenter outfit, cheerful expression, spring weather theme, sunny day with a few clouds, German city background"
+      ],
+      "title": "Base Prompt (Global Style)"
+    },
+    {
+      "id": 3,
+      "type": "CLIPTextEncode",
+      "pos": [400, 220],
+      "size": {"0": 420, "1": 164},
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [8],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "comic panel, cute anime girl Kira with short pink hair, green eyes, wearing a light blue weather presenter blazer, cheerful waving, speech bubble, morning greeting, pink cherry blossoms in background, spring atmosphere, clean comic art style, vibrant colors"
+      ],
+      "title": "Panel 1 - Kira Grüßt (Links)"
+    },
+    {
+      "id": 4,
+      "type": "CLIPTextEncode",
+      "pos": [400, 440],
+      "size": {"0": 420, "1": 164},
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [9],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "comic panel, bright sunny sky with a few fluffy white cumulus clouds, golden sun shining, spring weather, beautiful German city panorama, church spires, half-timbered houses, thermometer icon showing warm temperature, weather symbols, clean comic art style, vibrant colors"
+      ],
+      "title": "Panel 2 - Wetter Anzeige (Mitte)"
+    },
+    {
+      "id": 5,
+      "type": "CLIPTextEncode",
+      "pos": [400, 660],
+      "size": {"0": 420, "1": 164},
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [10],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "comic panel, cute anime girl Kira with short pink hair, green eyes, wearing light spring outfit with sunglasses on head, pointing upward with one finger, happy confident expression, speech bubble with outfit tip, park background with spring flowers, clean comic art style, vibrant colors"
+      ],
+      "title": "Panel 3 - Kira Outfit-Tipp (Rechts)"
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [400, 880],
+      "size": {"0": 420, "1": 130},
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [11],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "realistic photo, photograph, ugly, deformed, disfigured, blurry, low quality, bad anatomy, extra limbs, text errors, watermark, signature, cropped, worst quality, low resolution, jpeg artifacts, 3d render"
+      ],
+      "title": "Negative Prompt"
+    },
+    {
+      "id": 7,
+      "type": "ConditioningSetArea",
+      "pos": [900, 220],
+      "size": {"0": 262, "1": 150},
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [12],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningSetArea"
+      },
+      "widgets_values": [
+        448,
+        768,
+        0,
+        0,
+        1.0
+      ],
+      "title": "Area Panel 1 (Links)"
+    },
+    {
+      "id": 8,
+      "type": "ConditioningSetArea",
+      "pos": [900, 440],
+      "size": {"0": 262, "1": 150},
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [13],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningSetArea"
+      },
+      "widgets_values": [
+        448,
+        768,
+        448,
+        0,
+        1.0
+      ],
+      "title": "Area Panel 2 (Mitte)"
+    },
+    {
+      "id": 9,
+      "type": "ConditioningSetArea",
+      "pos": [900, 660],
+      "size": {"0": 262, "1": 150},
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [14],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningSetArea"
+      },
+      "widgets_values": [
+        448,
+        768,
+        896,
+        0,
+        1.0
+      ],
+      "title": "Area Panel 3 (Rechts)"
+    },
+    {
+      "id": 10,
+      "type": "ConditioningCombine",
+      "pos": [1250, 280],
+      "size": {"0": 218, "1": 46},
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning_1",
+          "type": "CONDITIONING",
+          "link": 12
+        },
+        {
+          "name": "conditioning_2",
+          "type": "CONDITIONING",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [15],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningCombine"
+      },
+      "title": "Combine Panel 1+2"
+    },
+    {
+      "id": 11,
+      "type": "ConditioningCombine",
+      "pos": [1250, 400],
+      "size": {"0": 218, "1": 46},
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning_1",
+          "type": "CONDITIONING",
+          "link": 15
+        },
+        {
+          "name": "conditioning_2",
+          "type": "CONDITIONING",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [16],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningCombine"
+      },
+      "title": "Combine Panels 1+2+3"
+    },
+    {
+      "id": 12,
+      "type": "ConditioningCombine",
+      "pos": [1250, 520],
+      "size": {"0": 218, "1": 46},
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning_1",
+          "type": "CONDITIONING",
+          "link": 7
+        },
+        {
+          "name": "conditioning_2",
+          "type": "CONDITIONING",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [17],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ConditioningCombine"
+      },
+      "title": "Combine Base + All Panels"
+    },
+    {
+      "id": 13,
+      "type": "EmptyLatentImage",
+      "pos": [1250, 660],
+      "size": {"0": 262, "1": 110},
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [18],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        1344,
+        768,
+        1
+      ],
+      "title": "Comic Strip Canvas (1344x768)"
+    },
+    {
+      "id": 14,
+      "type": "KSampler",
+      "pos": [1560, 300],
+      "size": {"0": 315, "1": 262},
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 17
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 11
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [19],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        42,
+        "randomize",
+        30,
+        7.5,
+        "dpmpp_2m",
+        "karras",
+        1
+      ]
+    },
+    {
+      "id": 15,
+      "type": "VAEDecode",
+      "pos": [1940, 400],
+      "size": {"0": 210, "1": 46},
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 19
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [20, 21],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 16,
+      "type": "SaveImage",
+      "pos": [2200, 300],
+      "size": {"0": 530, "1": 580},
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 20
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "KiraWetter"
+      ],
+      "title": "Kira Wetter Comic speichern"
+    },
+    {
+      "id": 17,
+      "type": "PreviewImage",
+      "pos": [2200, 920],
+      "size": {"0": 530, "1": 400},
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 21
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "title": "Vorschau"
+    }
+  ],
+  "links": [
+    [1, 1, 0, 14, 0, "MODEL"],
+    [2, 1, 1, 2, 0, "CLIP"],
+    [3, 1, 1, 3, 0, "CLIP"],
+    [4, 1, 1, 4, 0, "CLIP"],
+    [5, 1, 1, 5, 0, "CLIP"],
+    [6, 1, 2, 15, 1, "VAE"],
+    [7, 2, 0, 12, 0, "CONDITIONING"],
+    [8, 3, 0, 7, 0, "CONDITIONING"],
+    [9, 4, 0, 8, 0, "CONDITIONING"],
+    [10, 5, 0, 9, 0, "CONDITIONING"],
+    [11, 6, 0, 14, 2, "CONDITIONING"],
+    [12, 7, 0, 10, 0, "CONDITIONING"],
+    [13, 8, 0, 10, 1, "CONDITIONING"],
+    [14, 9, 0, 11, 1, "CONDITIONING"],
+    [15, 10, 0, 11, 0, "CONDITIONING"],
+    [16, 11, 0, 12, 1, "CONDITIONING"],
+    [17, 12, 0, 14, 1, "CONDITIONING"],
+    [18, 13, 0, 14, 3, "LATENT"],
+    [19, 14, 0, 15, 0, "LATENT"],
+    [20, 15, 0, 16, 0, "IMAGE"],
+    [21, 15, 0, 17, 0, "IMAGE"]
+  ],
+  "groups": [
+    {
+      "title": "Kira Character & Wetter Prompts",
+      "bounding": [380, -30, 470, 1060],
+      "color": "#F48FB1",
+      "font_size": 24
+    },
+    {
+      "title": "Panel Layout (Area Composition)",
+      "bounding": [880, 190, 300, 650],
+      "color": "#81D4FA",
+      "font_size": 24
+    },
+    {
+      "title": "Conditioning Kombination",
+      "bounding": [1220, 240, 280, 370],
+      "color": "#A5D6A7",
+      "font_size": 24
+    },
+    {
+      "title": "Sampling & Ausgabe",
+      "bounding": [1540, 260, 1220, 1080],
+      "color": "#FFE082",
+      "font_size": 24
+    }
+  ],
+  "config": {},
+  "extra": {
+    "info": {
+      "name": "Kira Wetter-Comic",
+      "description": "Generiert einen 3-Panel Comic Strip mit dem Charakter Kira, die das aktuelle Wetter präsentiert. Optimiert für lokale deutsche Zielgruppen.",
+      "author": "ComfyUI Weather Comic Example",
+      "version": "1.0"
+    }
+  },
+  "version": 0.4
+}
