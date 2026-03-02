@@ -1,0 +1,2 @@
+# Environment variables (may contain secrets)
+.env
