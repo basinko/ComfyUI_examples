@@ -50,3 +50,34 @@ Du hast über **Blender MCP** direkten Zugriff auf mein laufendes Blender 5.0. A
 - **Kurz berichten:** Schreib nach jedem Schritt in 2–3 Sätzen auf Deutsch, was du gemacht hast, und zeig den Screenshot.
 
 ---
+
+## Token sparen
+
+**Kein Browser- oder Computer-Use für Blender.** Blender ist ein Desktop-Programm. Browser-Use kommt gar nicht heran. Computer-Use braucht für jeden Klick einen Screenshot, und jeder Screenshot kostet viele Token. Ein Modell bauen hieße Hunderte Klicks. Python-Code ist 10- bis 50-mal günstiger.
+
+**Am günstigsten: Claude Code + Blender ohne Oberfläche**
+Claude Code (Terminal) auf deinem Rechner, Blender läuft im Hintergrund:
+```
+blender -b robi_v2.blend -P bauteil.py
+```
+- Der Code steckt in Dateien. Claude ändert nur einzelne Zeilen (Parameter) und muss nicht jedes Mal das ganze Skript neu schreiben.
+- Jedes Skript rendert ein kleines Kontrollbild (512 px), das Claude ansieht. Mehr Bilder braucht es nicht.
+
+**Mit Blender MCP sparsam arbeiten**
+- Screenshots klein halten (max. 512 px) und nur einen pro fertigem Bauteil.
+- Szeneninfo nur einmal am Anfang abfragen. Danach gezielt einzelne Objekte abfragen.
+- Wiederkehrende Funktionen einmal als Hilfsmodul in Blender anlegen (`robi_lib`) und danach nur noch aufrufen.
+
+**Allgemein**
+- Pro Meilenstein ein neuer Chat. Am Ende des alten Chats eine Zusammenfassung mit Stand, Parametern und nächstem Schritt erstellen lassen und damit den neuen Chat starten.
+- Für Routineschritte (Materialien, Licht) reicht ein kleineres Modell. Das größte Modell nur für Formen und Rig nehmen.
+
+### Spar-Block für den Prompt
+---
+Arbeite token-sparsam:
+- Kein Computer-Use und keine Klicks. Arbeite nur mit Python über `execute_blender_code` bzw. Skriptdateien.
+- Leg alle wiederverwendbaren Funktionen einmal als Text-Datenblock `robi_lib` in Blender an. Später rufst du nur noch diese Funktionen mit Parametern auf und schickst nicht erneut den ganzen Code.
+- Mach höchstens **einen** Viewport-Screenshot pro fertigem Bauteil, mit max. 512 px. Frag die Szeneninfo nur einmal am Anfang ab.
+- Antworte kurz: ein Satz zum Ergebnis, Abweichungen als Stichpunkte, kein Code im Chat außer dem, der ausgeführt wird.
+- Wenn ein Meilenstein fertig ist, schreib eine Übergabe in höchstens 15 Zeilen: Parameter, Objektnamen, nächster Schritt. Damit starte ich den nächsten Chat.
+---
