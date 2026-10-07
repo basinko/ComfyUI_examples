@@ -15,12 +15,9 @@ Projekt: https://github.com/ahujasid/blender-mcp (Open Source, läuft lokal auf 
 3. **Claude verbinden**
    - **Claude Desktop:** Einstellungen → Entwickler → Konfiguration bearbeiten → in `claude_desktop_config.json` eintragen:
      ```json
-     {
-       "mcpServers": {
-         "blender": { "command": "uvx", "args": ["blender-mcp"] }
-       }
-     }
+     {"mcpServers": {"blender": {"command": "uvx", "args": ["blender-mcp"]}}}
      ```
+     Falls dort schon Einträge stehen: nur `"blender": {...}` in das bestehende `"mcpServers"` einfügen.
      Danach Claude Desktop komplett neu starten.
    - **Claude Code (Terminal):** `claude mcp add blender uvx blender-mcp`
 4. **Starten**
@@ -35,7 +32,7 @@ Projekt: https://github.com/ahujasid/blender-mcp (Open Source, läuft lokal auf 
 
 ## Start-Prompt für den neuen Chat (Claude Desktop mit Blender MCP)
 
-Füge den Prompt aus `NEUER_CHAT_PROMPT_PRAEZISE.md` ein, hänge das Character Sheet an und setze **diesen Block davor**:
+Am kürzesten: nimm `ROBI_PROMPT_KOMPLETT.md`. Er enthält schon die Sparregeln, die MCP-Arbeitsweise und alle Maße. Alternativ: Füge den Prompt aus `NEUER_CHAT_PROMPT_PRAEZISE.md` ein, hänge das Character Sheet an und setze **diesen Block davor**:
 
 ---
 
