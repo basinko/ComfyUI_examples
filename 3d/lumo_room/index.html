@@ -1,0 +1,382 @@
+<title>Lumos Zimmer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+  /* Layout: full-bleed 3D stage, a small caption top-left, controls bottom bar. Single dark world. */
+  :root {
+    --bg: #14181d;
+    --fg: #e9e6df;
+    --muted: #8b939c;
+    --glow: #ffc23d;
+    --panel: rgba(28, 33, 39, .78);
+    --line: rgba(233, 230, 223, .14);
+    --display: "Fredoka", "Nunito", system-ui, sans-serif;
+    --body: "IBM Plex Sans", system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); overflow: hidden; }
+  #stage { position: fixed; inset: 0; }
+  #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  .cap { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 16px; right: 16px; pointer-events: none; display: grid; gap: 4px; max-width: 30rem; }
+  .cap h1 { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.1rem); letter-spacing: .01em; text-wrap: balance; }
+  .cap h1 span { color: var(--glow); text-shadow: 0 0 18px rgba(255, 194, 61, .55); }
+  .cap p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+  .bar { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .bar button { font: 500 .9rem var(--body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: .55rem 1rem; cursor: pointer; backdrop-filter: blur(8px); }
+  .bar button[aria-pressed="true"] { border-color: var(--glow); color: var(--glow); }
+  .bar button:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+  .hint { position: fixed; right: 16px; top: calc(16px + env(safe-area-inset-top, 0px)); color: var(--muted); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; }
+  @media (max-width: 640px) { .hint { display: none; } }
+</style>
+
+<div id="stage" aria-label="3D-Szene: Lumo in seinem Zimmer"></div>
+<div class="cap">
+  <h1><span>Lumo</span> ist zu Hause</h1>
+  <p>Ein kleiner Astronaut im Hoodie mit leuchtendem Gesicht, in seinem dunklen Zimmer mit warmen Lampen.</p>
+</div>
+<div class="hint">Ziehen zum Drehen · Scrollen zum Zoomen</div>
+<div class="bar">
+  <button id="walk" type="button" aria-pressed="true">Herumlaufen</button>
+  <button id="lamps" type="button" aria-pressed="true">Lampen an</button>
+  <button id="wave" type="button">Winken</button>
+  <button id="reset" type="button">Ansicht zurücksetzen</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.95;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x14181d);
+
+  // Isometric-style orthographic camera
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+  const HOME = new THREE.Vector3(12, 11, 12);
+  camera.position.copy(HOME);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 1.4, 0);
+  controls.enableDamping = true;
+  controls.enablePan = false;
+  controls.minZoom = 0.6; controls.maxZoom = 3;
+  controls.minPolarAngle = 0.35; controls.maxPolarAngle = 1.35;
+  controls.minAzimuthAngle = -0.15; controls.maxAzimuthAngle = Math.PI / 2 + 0.15;
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight, a = w / h;
+    const s = a < 0.8 ? 7.4 / a : 6.2;
+    camera.left = -s * a; camera.right = s * a; camera.top = s; camera.bottom = -s;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  addEventListener('resize', resize);
+
+  // ---------- helpers ----------
+  const M = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: 0.8, metalness: 0 }, o));
+  function box(w, h, d, mat, x, y, z, parent = scene) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m;
+  }
+  function cyl(rt, rb, h, mat, x, y, z, parent = scene, seg = 24) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
+    m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; parent.add(m); return m;
+  }
+
+  const wallMat = M(0x262c33, { roughness: 0.95 });
+  const trimMat = M(0x56636f, { roughness: 0.9 });
+  const woodMat = M(0xc08a55, { roughness: 0.7 });
+  const darkMat = M(0x23272c, { roughness: 0.6 });
+  const blackMat = M(0x1a1d21, { roughness: 0.5 });
+  const linenMat = M(0xd9d6cf);
+  const greyMat = M(0xb9bcc0);
+
+  // ---------- room shell ----------
+  const S = 8, H = 5.2, T = 0.35;
+  box(S + T, 0.5, S + T, trimMat, T / 2 * 0, -0.25, 0);              // base slab
+  // wood planks
+  for (let i = 0; i < 10; i++) {
+    const p = box(S / 10 - 0.02, 0.06, S, M(i % 2 ? 0xc48f5a : 0xb98250, { roughness: 0.7 }), -S / 2 + S / 20 + i * S / 10, 0.03, 0);
+    p.castShadow = false;
+  }
+  box(S, H, T, wallMat, 0, H / 2, -S / 2 - T / 2);                        // back wall
+  box(T, H, S + T, wallMat, -S / 2 - T / 2, H / 2, -T / 2);              // left wall
+  box(S + T * 2, 0.12, T + 0.02, trimMat, -T / 2, H + 0.06, -S / 2 - T / 2);
+  box(T + 0.02, 0.12, S + T, trimMat, -S / 2 - T / 2, H + 0.06, -T / 2);
+  // wall panel grooves on back wall
+  for (let i = 1; i < 6; i++) box(0.03, H - 0.4, 0.02, M(0x232930), -S / 2 + i * S / 6, H / 2 + 0.1, -S / 2 + 0.01);
+
+  // ---------- window (left wall) ----------
+  const winZ = -1.6;
+  const daylight = new THREE.MeshBasicMaterial({ color: 0xdfe9f2 });
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.6), daylight);
+  win.rotation.y = Math.PI / 2; win.position.set(-S / 2 + 0.01, 2.6, winZ); scene.add(win);
+  box(0.12, 0.08, 2.4, darkMat, -S / 2 + 0.06, 1.28, winZ);
+  box(0.12, 0.08, 2.4, darkMat, -S / 2 + 0.06, 3.92, winZ);
+  box(0.12, 2.7, 0.08, darkMat, -S / 2 + 0.06, 2.6, winZ - 1.14);
+  box(0.12, 2.7, 0.08, darkMat, -S / 2 + 0.06, 2.6, winZ + 1.14);
+  box(0.1, 2.7, 0.05, darkMat, -S / 2 + 0.06, 2.6, winZ);
+  box(0.1, 0.05, 2.3, darkMat, -S / 2 + 0.06, 2.6, winZ);
+  // blind slats
+  for (let i = 0; i < 9; i++) box(0.05, 0.05, 2.2, M(0xe8e6e1), -S / 2 + 0.14, 3.85 - i * 0.07, winZ);
+  // curtains
+  box(0.18, 4.4, 0.5, darkMat, -S / 2 + 0.12, 2.3, winZ - 1.55);
+  box(0.18, 4.4, 0.5, darkMat, -S / 2 + 0.12, 2.3, winZ + 1.55);
+  const sun = new THREE.SpotLight(0xcfe0ff, 0.9, 14, 0.7, 0.6, 1);
+  sun.position.set(-S / 2 - 1.5, 4.2, winZ); sun.target.position.set(0, 0, winZ + 0.5);
+  sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); scene.add(sun, sun.target);
+
+  // ---------- bed (back wall) ----------
+  const bed = new THREE.Group(); bed.position.set(-0.2, 0, -S / 2 + 1.75); scene.add(bed);
+  box(2.9, 0.55, 3.4, blackMat, 0, 0.28, 0, bed);
+  box(3.0, 1.5, 0.2, blackMat, 0, 0.9, -1.7, bed);                   // headboard
+  box(2.8, 0.3, 3.2, linenMat, 0, 0.7, 0, bed);                     // mattress
+  box(2.9, 0.12, 2.1, M(0x2a2e33, { roughness: 0.9 }), 0, 0.9, 0.58, bed); // duvet
+  box(2.92, 0.36, 0.1, M(0x2a2e33, { roughness: 0.9 }), 0, 0.73, 1.62, bed);
+  for (const x of [-0.68, 0.68]) {
+    const p = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 14), linenMat);
+    p.scale.set(1.25, 0.32, 0.65); p.position.set(x, 1.0, -1.15); p.castShadow = true; bed.add(p);
+  }
+  // shelf above bed with books
+  box(2.6, 0.08, 0.35, blackMat, -0.2, 3.1, -S / 2 + 0.18);
+  const bookCols = [0x8a5a44, 0xdedad2, 0x3e5568, 0xb59a6b, 0x5c6b5a, 0xdedad2];
+  bookCols.forEach((c, i) => box(0.14, 0.42 + (i % 3) * 0.06, 0.28, M(c), -1.3 + i * 0.16, 3.37, -S / 2 + 0.18));
+  box(0.5, 0.12, 0.3, M(0xdedad2), 0.4, 3.2, -S / 2 + 0.18);
+
+  // ---------- lamps ----------
+  const lampLights = [];
+  const shadeMat = new THREE.MeshStandardMaterial({ color: 0xffe2a8, emissive: 0xffb84d, emissiveIntensity: 1.6, roughness: 0.6 });
+  function lamp(x, y, z, castShadow) {
+    cyl(0.08, 0.14, 0.08, blackMat, x, y + 0.04, z);
+    cyl(0.025, 0.025, 0.35, blackMat, x, y + 0.24, z);
+    cyl(0.17, 0.27, 0.32, shadeMat, x, y + 0.55, z).castShadow = false;
+    const l = new THREE.PointLight(0xffb85a, 1.3, 5.5, 2);
+    l.position.set(x, y + 0.5, z + 0.1); l.castShadow = castShadow;
+    if (castShadow) { l.shadow.mapSize.set(512, 512); l.shadow.bias = -0.004; }
+    scene.add(l); lampLights.push(l);
+  }
+  // nightstands
+  for (const x of [-2.25, 1.85]) {
+    box(0.9, 0.75, 0.8, darkMat, x, 0.375, -S / 2 + 0.6);
+    box(0.7, 0.03, 0.02, M(0x6f6a62), x, 0.5, -S / 2 + 1.01);
+    lamp(x, 0.75, -S / 2 + 0.55, x < 0);
+  }
+  // little plant on nightstand
+  cyl(0.09, 0.07, 0.15, linenMat, -2.0, 0.83, -S / 2 + 0.8);
+  const leafMat = M(0x5d8a4a, { roughness: 0.7 });
+  for (let i = 0; i < 5; i++) {
+    const lf = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), leafMat);
+    lf.position.set(-2.0 + Math.cos(i) * 0.07, 0.98 + (i % 2) * 0.05, -S / 2 + 0.8 + Math.sin(i) * 0.07); scene.add(lf);
+  }
+
+  // ---------- desk (right side, back wall) ----------
+  const desk = new THREE.Group(); desk.position.set(3.0, 0, -S / 2 + 2.6); scene.add(desk);
+  box(1.0, 0.08, 2.6, blackMat, 0, 1.15, 0, desk);
+  box(0.9, 0.35, 1.0, darkMat, 0, 0.92, 0.7, desk);
+  for (const [dx, dz] of [[-0.4, -1.2], [0.4, -1.2], [-0.4, 1.2], [0.4, 1.2]]) box(0.06, 1.12, 0.06, blackMat, dx, 0.56, dz, desk);
+  box(0.42, 0.04, 0.6, M(0xe6e2da), -0.05, 1.21, -0.2, desk);       // book / laptop
+  box(0.35, 0.03, 0.12, M(0x2f3439), 0.05, 1.21, 0.5, desk);        // keyboard
+  lamp(3.15, 1.19, -S / 2 + 1.5, false);
+  lamp(3.15, 1.19, -S / 2 + 3.65, false);
+  // chair
+  const chair = new THREE.Group(); chair.position.set(2.0, 0, -S / 2 + 2.6); chair.rotation.y = -Math.PI / 2; scene.add(chair);
+  box(0.7, 0.07, 0.65, blackMat, 0, 0.7, 0, chair);
+  box(0.7, 0.75, 0.07, blackMat, 0, 1.1, -0.3, chair);
+  for (const [dx, dz] of [[-0.3, -0.28], [0.3, -0.28], [-0.3, 0.28], [0.3, 0.28]]) box(0.04, 0.7, 0.04, blackMat, dx, 0.35, dz, chair);
+
+  // ---------- wall art & clock ----------
+  function frame(w, h, x, y, z, rotY, drawFn) {
+    const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = rotY; scene.add(g);
+    box(w, h, 0.06, blackMat, 0, 0, 0, g);
+    const c = document.createElement('canvas'); c.width = 256; c.height = Math.round(256 * h / w);
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#efece6'; ctx.fillRect(0, 0, c.width, c.height); drawFn(ctx, c.width, c.height);
+    const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding;
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.86, h * 0.88), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 }));
+    p.position.z = 0.035; g.add(p);
+  }
+  frame(1.0, 1.3, -2.3, 3.6, -S / 2 + 0.03, 0, (c, w, h) => { c.fillStyle = '#26292d'; c.fillRect(w * .35, h * .3, w * .3, h * .55); c.fillRect(w * .45, h * .18, w * .1, h * .15); });
+  frame(0.75, 1.15, 0.9, 3.75, -S / 2 + 0.03, 0, (c, w, h) => { c.strokeStyle = '#26292d'; c.lineWidth = 6; c.beginPath(); c.moveTo(w * .4, h * .35); c.lineTo(w * .58, h * .55); c.stroke(); });
+  frame(1.9, 1.3, 2.4, 3.3, -S / 2 + 0.03, 0, (c, w, h) => { c.fillStyle = '#22252a'; c.beginPath(); c.moveTo(w * .2, h * .45); c.quadraticCurveTo(w * .42, h * .25, w * .5, h * .5); c.quadraticCurveTo(w * .6, h * .25, w * .82, h * .4); c.quadraticCurveTo(w * .58, h * .42, w * .5, h * .62); c.quadraticCurveTo(w * .42, h * .42, w * .2, h * .45); c.fill(); });
+  frame(0.8, 0.9, -S / 2 + 0.03, 3.4, 1.3, Math.PI / 2, (c, w, h) => { c.fillStyle = '#ffc23d'; c.beginPath(); c.arc(w / 2, h / 2, w * .22, 0, 7); c.fill(); c.fillStyle = '#26292d'; c.fillRect(w * .4, h * .44, w * .05, h * .1); c.fillRect(w * .55, h * .44, w * .05, h * .1); });
+  // clock
+  const clock = new THREE.Group(); clock.position.set(-1.0, 4.15, -S / 2 + 0.05); scene.add(clock);
+  const face = cyl(0.55, 0.55, 0.08, M(0xf1eee8), 0, 0, 0, clock, 40); face.rotation.x = Math.PI / 2;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.56, 0.05, 10, 40), blackMat); clock.add(rim);
+  for (let i = 0; i < 12; i++) { const t = box(0.03, 0.09, 0.02, blackMat, Math.sin(i * Math.PI / 6) * 0.45, Math.cos(i * Math.PI / 6) * 0.45, 0.05, clock); t.rotation.z = -i * Math.PI / 6; }
+  const handH = new THREE.Group(), handM = new THREE.Group(); clock.add(handH, handM);
+  box(0.04, 0.26, 0.02, blackMat, 0, 0.11, 0.07, handH);
+  box(0.025, 0.4, 0.02, blackMat, 0, 0.18, 0.08, handM);
+
+  // ---------- rug, armchair, coffee table, pouf ----------
+  const rug = box(4.4, 0.04, 3.4, M(0xd8d5ce, { roughness: 1 }), -0.2, 0.08, 1.6); rug.castShadow = false;
+  const arm = new THREE.Group(); arm.position.set(-3.0, 0, 0.9); arm.rotation.y = Math.PI / 2 - 0.35; scene.add(arm);
+  box(1.4, 0.45, 1.2, greyMat, 0, 0.42, 0, arm);
+  box(1.4, 1.0, 0.25, greyMat, 0, 0.95, -0.5, arm);
+  box(0.22, 0.75, 1.2, greyMat, -0.6, 0.62, 0, arm);
+  box(0.22, 0.75, 1.2, greyMat, 0.6, 0.62, 0, arm);
+  box(1.0, 0.15, 0.9, M(0xcfd1d4), 0, 0.72, 0.1, arm);
+  for (const [dx, dz] of [[-0.6, -0.5], [0.6, -0.5], [-0.6, 0.5], [0.6, 0.5]]) cyl(0.04, 0.03, 0.2, blackMat, dx, 0.1, dz, arm, 8);
+  box(1.3, 0.85, 1.0, darkMat, 0.4, 0.43, 2.3);                       // coffee table
+  box(0.6, 0.06, 0.45, M(0xe6e2da), 0.3, 0.88, 2.2);                  // tray
+  cyl(0.08, 0.06, 0.18, linenMat, 0.65, 0.95, 2.45);
+  cyl(0.45, 0.45, 0.55, greyMat, -1.6, 0.36, 2.3, scene, 32);         // pouf
+  box(0.45, 0.08, 0.35, M(0x6b7f8c), -1.6, 0.68, 2.3);
+  box(0.42, 0.06, 0.32, M(0xdedad2), -1.6, 0.75, 2.3);
+  // floor plant in corner
+  cyl(0.32, 0.24, 0.6, linenMat, -S / 2 + 0.55, 0.3, S / 2 - 0.6);
+  const bigLeaf = M(0x4c7a3e, { roughness: 0.75 });
+  for (let i = 0; i < 9; i++) {
+    const lf = new THREE.Mesh(new THREE.ConeGeometry(0.12, 1.1, 6), bigLeaf);
+    lf.position.set(-S / 2 + 0.55, 1.1, S / 2 - 0.6);
+    lf.rotation.set(Math.cos(i * 2.4) * 0.5, 0, Math.sin(i * 2.4) * 0.5); lf.castShadow = true; scene.add(lf);
+  }
+
+  // ---------- LUMO: the character ----------
+  const lumo = new THREE.Group(); scene.add(lumo);
+  const suit = M(0xf2f0ec, { roughness: 0.55 });
+  const suitShade = M(0xe4e1db, { roughness: 0.6 });
+  const amber = M(0xf0a830, { roughness: 0.4, emissive: 0x6b3a00, emissiveIntensity: 0.4 });
+  const visorMat = new THREE.MeshStandardMaterial({ color: 0xffb81c, emissive: 0xffa600, emissiveIntensity: 1.0, roughness: 0.15, toneMapped: false });
+  const eyeMat = M(0x3a2410, { roughness: 0.3 });
+  const SC = 0.68; lumo.scale.setScalar(SC);
+
+  // torso (hoodie)
+  const torso = new THREE.Group(); torso.position.y = 2.0; lumo.add(torso);
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.75, 28, 20), suit);
+  body.scale.set(1.05, 1, 0.85); body.castShadow = true; torso.add(body);
+  box(1.15, 0.18, 0.95, suitShade, 0, -0.62, 0, torso);                 // waistband
+  const pocket = box(0.75, 0.32, 0.05, suitShade, 0, -0.3, 0.5, torso); pocket.castShadow = false;
+  for (const x of [-0.15, 0.15]) { const s = cyl(0.02, 0.02, 0.5, suitShade, x, 0.25, 0.55, torso, 6); }
+  // backpack
+  const pack = new THREE.Group(); pack.position.set(0, 0.15, -0.55); torso.add(pack);
+  const pk = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 16), suit); pk.scale.set(1.1, 1.4, 0.7); pk.castShadow = true; pack.add(pk);
+  box(0.7, 0.14, 0.3, amber, 0, -0.25, -0.2, pack);
+  const led = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), new THREE.MeshBasicMaterial({ color: 0xff5a2a })); led.position.set(0.25, 0.35, -0.32); pack.add(led);
+
+  // head: hood + glowing face
+  const head = new THREE.Group(); head.position.y = 1.45; torso.add(head);
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(1.0, 32, 24), suit); hood.scale.set(1.05, 0.95, 1.0); hood.castShadow = true; head.add(hood);
+  const visor = new THREE.Mesh(new THREE.SphereGeometry(0.82, 32, 24, 0, Math.PI * 2, 0, Math.PI * 0.5), visorMat);
+  visor.rotation.x = Math.PI / 2; visor.scale.set(0.95, 0.5, 0.82); visor.position.z = 0.6; head.add(visor);
+  const rimRing = new THREE.Mesh(new THREE.TorusGeometry(0.84, 0.09, 12, 40), suitShade);
+  rimRing.scale.set(0.95, 0.86, 1); rimRing.position.z = 0.66; head.add(rimRing);
+  const eyes = [];
+  for (const x of [-0.27, 0.27]) {
+    const e = new THREE.Mesh(new THREE.SphereGeometry(0.085, 14, 12), eyeMat);
+    e.scale.set(0.9, 1.6, 0.4); e.position.set(x, 0.05, 1.08); head.add(e); eyes.push(e);
+  }
+  const faceLight = new THREE.PointLight(0xffb43a, 2.2, 4.5, 2); faceLight.position.set(0, -0.2, 1.5); head.add(faceLight);
+
+  // arms
+  function makeArm(side) {
+    const sh = new THREE.Group(); sh.position.set(side * 0.72, 0.35, 0); torso.add(sh);
+    const up = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.8, 16), suit); up.position.y = -0.4; up.castShadow = true; sh.add(up);
+    cyl(0.23, 0.23, 0.12, suitShade, 0, -0.78, 0, sh);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.19, 14, 12), suit); hand.scale.set(0.9, 1.1, 0.7); hand.position.y = -0.98; hand.castShadow = true; sh.add(hand);
+    sh.rotation.z = side * 0.18; return sh;
+  }
+  const armL = makeArm(-1), armR = makeArm(1);
+  // legs + sneakers
+  function makeLeg(side) {
+    const hip = new THREE.Group(); hip.position.set(side * 0.3, -0.7, 0); torso.add(hip);
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.24, 0.85, 16), suit); leg.position.y = -0.42; leg.castShadow = true; hip.add(leg);
+    cyl(0.25, 0.25, 0.12, suitShade, 0, -0.85, 0, hip);
+    box(0.32, 0.1, 0.1, amber, 0, -0.97, -0.12, hip);
+    const shoe = box(0.42, 0.26, 0.7, M(0xf7f6f3, { roughness: 0.5 }), 0, -1.08, 0.1, hip);
+    box(0.44, 0.07, 0.72, M(0xdcd8d0), 0, -1.2, 0.1, hip);
+    return hip;
+  }
+  const legL = makeLeg(-1), legR = makeLeg(1);
+
+  // ---------- global lighting ----------
+  scene.add(new THREE.HemisphereLight(0x8fa3b8, 0x2a1d12, 0.18));
+  const fill = new THREE.DirectionalLight(0xffe8cc, 0.18); fill.position.set(6, 10, 8); scene.add(fill);
+
+  // ---------- behaviour ----------
+  const path = [new THREE.Vector3(-0.8, 0, 1.0), new THREE.Vector3(1.6, 0, 0.9), new THREE.Vector3(1.6, 0, -0.6), new THREE.Vector3(-0.2, 0, 3.4), new THREE.Vector3(-1.9, 0, 0.9)];
+  let target = 1, walking = true, waveT = 0, lampsOn = true, pause = 3.5;
+  lumo.position.copy(path[0]);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { walking = false; document.getElementById('walk').setAttribute('aria-pressed', 'false'); }
+  lumo.rotation.y = Math.PI / 4;
+
+  const btn = id => document.getElementById(id);
+  btn('walk').onclick = e => { walking = !walking; e.currentTarget.setAttribute('aria-pressed', walking); };
+  btn('lamps').onclick = e => {
+    lampsOn = !lampsOn; e.currentTarget.setAttribute('aria-pressed', lampsOn);
+    e.currentTarget.textContent = lampsOn ? 'Lampen an' : 'Lampen aus';
+    lampLights.forEach(l => l.intensity = lampsOn ? 1.3 : 0);
+    shadeMat.emissiveIntensity = lampsOn ? 1.6 : 0.05;
+  };
+  btn('wave').onclick = () => { waveT = 2.4; };
+  btn('reset').onclick = () => { camera.position.copy(HOME); camera.zoom = 1; camera.updateProjectionMatrix(); controls.target.set(0, 1.4, 0); };
+
+  const clockNow = new Date();
+  handH.rotation.z = -((clockNow.getHours() % 12) + clockNow.getMinutes() / 60) * Math.PI / 6;
+  handM.rotation.z = -clockNow.getMinutes() * Math.PI / 30;
+
+  let last = performance.now(), t = 0;
+  function tick(now) {
+    const dt = Math.min((now - last) / 1000, 0.05); last = now; t += dt;
+    let moving = false;
+    if (walking && pause <= 0 && waveT <= 0) {
+      const goal = path[target], d = goal.clone().sub(lumo.position); d.y = 0;
+      const dist = d.length();
+      if (dist < 0.05) { target = (target + 1) % path.length; pause = 1.2 + Math.random(); }
+      else {
+        const want = Math.atan2(d.x, d.z);
+        let diff = ((want - lumo.rotation.y + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+        lumo.rotation.y += diff * Math.min(1, dt * 5);
+        if (Math.abs(diff) < 0.6) { lumo.position.addScaledVector(d.normalize(), Math.min(dist, dt * 1.1)); moving = true; }
+      }
+    } else pause -= dt;
+
+    const ph = t * 7;
+    const sw = moving ? Math.sin(ph) * 0.55 : 0;
+    legL.rotation.x += (sw - legL.rotation.x) * 0.25;
+    legR.rotation.x += (-sw - legR.rotation.x) * 0.25;
+    armL.rotation.x += (-sw * 0.8 - armL.rotation.x) * 0.25;
+    torso.position.y = 2.0 + (moving ? Math.abs(Math.sin(ph)) * 0.08 : Math.sin(t * 2) * 0.025);
+
+    if (waveT > 0) {
+      waveT -= dt;
+      armR.rotation.x += (0 - armR.rotation.x) * 0.2;
+      armR.rotation.z += (2.6 - armR.rotation.z) * 0.2;
+      armR.rotation.y = Math.sin(t * 12) * 0.35;
+      head.rotation.z = Math.sin(t * 4) * 0.08;
+      // turn toward the camera
+      const toCam = Math.atan2(camera.position.x - lumo.position.x, camera.position.z - lumo.position.z);
+      let diff = ((toCam - lumo.rotation.y + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+      lumo.rotation.y += diff * Math.min(1, dt * 4);
+    } else {
+      armR.rotation.x += (sw * 0.8 - armR.rotation.x) * 0.25;
+      armR.rotation.z += (0.18 - armR.rotation.z) * 0.15;
+      armR.rotation.y *= 0.8;
+      head.rotation.z *= 0.9;
+      head.rotation.y = moving ? 0 : Math.sin(t * 0.7) * 0.35;
+    }
+    // blink
+    const blink = (t % 4.2) < 0.12 ? 0.15 : 1.6;
+    eyes.forEach(e => e.scale.y += (blink - e.scale.y) * 0.5);
+    // soft glow pulse
+    const pulse = 1.0 + Math.sin(t * 1.6) * 0.08;
+    visorMat.emissiveIntensity = pulse; faceLight.intensity = pulse * 1.8;
+    led.visible = (t % 1.6) < 1.1;
+
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  resize();
+  requestAnimationFrame(tick);
+})();
+</script>
