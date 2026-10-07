@@ -57,7 +57,7 @@
 (() => {
   // Hash tokens: still (hide UI), close (frame face), rec (frame-stepped for video capture), reel, plus an action or expression name.
   const tokens = location.hash.slice(1).split('-');
-  const STILL = tokens.includes('still'), REC = tokens.includes('rec'), FOLLOW = tokens.includes('follow');
+  const STILL = tokens.includes('still'), REC = tokens.includes('rec') || tokens.includes('export'), FOLLOW = tokens.includes('follow'), NORENDER = tokens.includes('export');
   if (STILL || REC) document.body.classList.add('still');
 
   const stage = document.getElementById('stage');
@@ -237,10 +237,10 @@
   const white = M(0xf3f1ec, { roughness: 0.55 });
   const sole = M(0xf7f5f0, { roughness: 0.6 });
 
-  const root = new THREE.Group(); root.scale.setScalar(0.6); scene.add(root);
-  const rig = new THREE.Group(); root.add(rig);
-  const hips = new THREE.Group(); rig.add(hips);
-  const torso = new THREE.Group(); torso.position.y = 0.05; hips.add(torso);
+  const root = new THREE.Group(); root.name = 'RoBi'; root.scale.setScalar(0.6); scene.add(root);
+  const rig = new THREE.Group(); rig.name = 'Rig'; root.add(rig);
+  const hips = new THREE.Group(); hips.name = 'Huefte'; rig.add(hips);
+  const torso = new THREE.Group(); torso.name = 'Torso'; torso.position.y = 0.05; hips.add(torso);
   ball(0.62, fabric, 0, 0.5, 0, torso, 1, 0.95, 0.82);
   cyl(0.55, 0.56, 0.14, fabricDk, 0, -0.02, 0, torso);
   box(0.66, 0.3, 0.08, fabricDk, 0, 0.3, 0.48, torso);
@@ -249,7 +249,7 @@
     cyl(0.03, 0.03, 0.07, metal, s * 0.13, 0.54, 0.5, torso, 8);
   }
   // backpack with glowing light
-  const pack = new THREE.Group(); pack.position.set(0, 0.62, -0.5); torso.add(pack);
+  const pack = new THREE.Group(); pack.name = 'Rucksack'; pack.position.set(0, 0.62, -0.5); torso.add(pack);
   ball(0.42, fabricDk, 0, 0, -0.12, pack, 1.15, 1.35, 0.65);
   box(0.5, 0.18, 0.12, fabric, 0, -0.3, -0.34, pack);
   const packLed = new THREE.Mesh(new THREE.CircleGeometry(0.1, 24), new THREE.MeshBasicMaterial({ color: 0xffa020, toneMapped: false }));
@@ -260,14 +260,14 @@
   // legs: hip > knee > foot
   const legs = {};
   for (const s of [-1, 1]) {
-    const hip = new THREE.Group(); hip.position.set(s * 0.24, 0, 0); hip.rotation.order = 'YXZ'; hips.add(hip);
+    const side = s < 0 ? 'L' : 'R'; const hip = new THREE.Group(); hip.name = 'Bein_' + side; hip.position.set(s * 0.24, 0, 0); hip.rotation.order = 'YXZ'; hips.add(hip);
     cyl(0.22, 0.21, 0.46, fabric, 0, -0.2, 0, hip);
     box(0.08, 0.2, 0.18, fabricDk, s * 0.21, -0.22, 0, hip);          // cargo pocket
     box(0.02, 0.06, 0.06, orange, s * 0.255, -0.15, 0.06, hip);
-    const knee = new THREE.Group(); knee.position.y = -0.42; hip.add(knee);
+    const knee = new THREE.Group(); knee.name = 'Knie_' + side; knee.position.y = -0.42; hip.add(knee);
     cyl(0.21, 0.2, 0.38, fabric, 0, -0.18, 0, knee);
     cyl(0.215, 0.215, 0.1, fabricDk, 0, -0.36, 0, knee);
-    const foot = new THREE.Group(); foot.position.y = -0.42; knee.add(foot);
+    const foot = new THREE.Group(); foot.name = 'Fuss_' + side; foot.position.y = -0.42; knee.add(foot);
     box(0.36, 0.2, 0.56, white, 0, 0, 0.08, foot);
     ball(0.18, white, 0, -0.01, 0.32, foot, 1, 0.6, 0.7);
     box(0.37, 0.12, 0.3, fabricDk, 0, 0.02, -0.02, foot);
@@ -278,34 +278,34 @@
   // arms: shoulder > elbow > hand (robo)
   const arms = {};
   for (const s of [-1, 1]) {
-    const sh = new THREE.Group(); sh.position.set(s * 0.58, 0.82, 0); torso.add(sh);
+    const side = s < 0 ? 'L' : 'R'; const sh = new THREE.Group(); sh.name = 'Schulter_' + side; sh.position.set(s * 0.58, 0.82, 0); torso.add(sh);
     ball(0.2, fabric, 0, 0, 0, sh);
     cyl(0.17, 0.18, 0.4, fabric, 0, -0.18, 0, sh);
-    const el = new THREE.Group(); el.position.y = -0.36; sh.add(el);
+    const el = new THREE.Group(); el.name = 'Ellbogen_' + side; el.position.y = -0.36; sh.add(el);
     cyl(0.17, 0.18, 0.34, fabric, 0, -0.15, 0, el);
     cyl(0.18, 0.18, 0.08, fabricDk, 0, -0.33, 0, el);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.03, 8, 20), orange); ring.rotation.x = Math.PI / 2; ring.position.y = -0.38; el.add(ring);
-    const hand = new THREE.Group(); hand.position.y = -0.4; hand.scale.setScalar(1.45); el.add(hand);
+    const hand = new THREE.Group(); hand.name = 'Hand_' + side; hand.position.y = -0.4; hand.scale.setScalar(1.45); el.add(hand);
     cyl(0.08, 0.09, 0.08, joint, 0, 0.02, 0, hand, 12);
     ball(0.13, metal, 0, -0.1, 0, hand, 1, 0.85, 0.72);
     box(0.2, 0.04, 0.15, joint, 0, -0.17, 0, hand);
     const fingers = [];
     for (let i = 0; i < 4; i++) {
-      const f = new THREE.Group(); f.position.set((i - 1.5) * 0.055, -0.18, 0.0); hand.add(f);
+      const f = new THREE.Group(); f.name = `Finger${i + 1}_${side}`; f.position.set((i - 1.5) * 0.055, -0.18, 0.0); hand.add(f);
       cyl(0.026, 0.026, 0.07, metal, 0, -0.035, 0, f, 8);
-      const f2 = new THREE.Group(); f2.position.y = -0.075; f.add(f2);
+      const f2 = new THREE.Group(); f2.name = `Finger${i + 1}b_${side}`; f2.position.y = -0.075; f.add(f2);
       ball(0.026, joint, 0, 0, 0, f2);
       cyl(0.024, 0.022, 0.06, metal, 0, -0.035, 0, f2, 8);
       fingers.push({ f, f2 });
     }
-    const thumb = new THREE.Group(); thumb.position.set(0, -0.08, 0.08); hand.add(thumb);
+    const thumb = new THREE.Group(); thumb.name = 'Daumen_' + side; thumb.position.set(0, -0.08, 0.08); hand.add(thumb);
     ball(0.032, joint, 0, 0, 0, thumb);
     cyl(0.03, 0.026, 0.14, metal, 0, -0.08, 0, thumb, 8);
     arms[s] = { sh, el, hand, fingers, thumb };
   }
   // head: hood + display face
-  const neck = new THREE.Group(); neck.position.y = 1.02; torso.add(neck);
-  const head = new THREE.Group(); head.position.y = 0.78; neck.add(head);
+  const neck = new THREE.Group(); neck.name = 'Hals'; neck.position.y = 1.02; torso.add(neck);
+  const head = new THREE.Group(); head.name = 'Kopf'; head.position.y = 0.78; neck.add(head);
   ball(1, fabric, 0, 0, 0, head, 1.1, 1.0, 1.0);
   ball(0.62, fabric, 0, 0.2, -0.5, head, 1.25, 1.0, 1.0);
   const rim = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.13, 16, 48), fabricDk);
@@ -322,13 +322,13 @@
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i); p.setZ(i, 0.55 + 0.48 * Math.sqrt(Math.max(0, 1 - (x / 1.25) ** 2 - (y / 1.0) ** 2))); }
     faceGeo.computeVertexNormals(); }
   const faceMesh = new THREE.Mesh(faceGeo, new THREE.MeshBasicMaterial({ map: faceTex, transparent: true, alphaTest: 0.5, toneMapped: false }));
-  head.add(faceMesh);
+  faceMesh.name = 'Display'; head.add(faceMesh);
   const faceLight = new THREE.PointLight(0xff9a2a, 1.6, 5, 2); faceLight.position.set(0, -0.1, 1.6); head.add(faceLight);
 
   // laptop (only while working)
-  const laptop = new THREE.Group(); laptop.position.set(0, 0.62, 0.78); root.add(laptop);
+  const laptop = new THREE.Group(); laptop.name = 'Laptop'; laptop.position.set(0, 0.62, 0.78); root.add(laptop);
   box(0.95, 0.05, 0.62, M(0x9a9da3, { roughness: 0.35, metalness: 0.5 }), 0, 0, 0, laptop);
-  const lid = new THREE.Group(); lid.position.set(0, 0.02, -0.3); laptop.add(lid);
+  const lid = new THREE.Group(); lid.name = 'Laptop_Deckel'; lid.position.set(0, 0.02, -0.3); laptop.add(lid);
   box(0.95, 0.62, 0.04, M(0x9a9da3, { roughness: 0.35, metalness: 0.5 }), 0, 0.31, 0, lid);
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 0.52), new THREE.MeshBasicMaterial({ color: 0xbfd6ff })); scr.position.set(0, 0.31, 0.025); lid.add(scr);
   lid.rotation.x = -0.25; laptop.visible = false;
@@ -603,11 +603,17 @@
       if (closeUp) frameFace(true), camAnim = Math.max(camAnim, 0.05);
     }
     controls.update();
-    renderer.render(scene, camera);
+    if (!NORENDER) renderer.render(scene, camera);
   }
   resize();
   if (tokens.includes('close')) { frameFace(true); camera.position.copy(camGoal.pos); controls.target.copy(camGoal.tgt); camera.zoom = camGoal.zoom; camera.updateProjectionMatrix(); }
   if (tokens.includes('reel')) startReel();
+  // export hook (used by the Blender export script, not by the page UI)
+  if (NORENDER) window.__robi = {
+    scene, root, laptop, faceMesh, fc, EXPR, EXPR_KEYS, ACTIONS, ACT_KEYS, E0,
+    drawFace: k => drawFace(Object.assign({}, E0, EXPR[k]), 1),
+    setAction: k => { setAction(k); const h = ACTIONS[k].home; if (h) { root.position.set(h.x, 0.1 + h.y, h.z); root.rotation.y = h.f; } else { pathI = 0; root.position.set(PATH[0].x, 0.1, PATH[0].z); } },
+  };
   if (REC) { window.__step = (n, dt) => { for (let i = 0; i < n; i++) step(dt); return true; }; step(1 / 30); window.__ready = true; }
   else { let last = performance.now(); (function loop(now) { step(Math.min((now - last) / 1000, 0.05)); last = now; requestAnimationFrame(loop); })(last); }
 })();
