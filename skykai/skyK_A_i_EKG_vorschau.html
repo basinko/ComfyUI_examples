@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0">
+<title>skyK(A)i EKG-Logo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: eine 16:9-Bühne, darunter eine schmale Steuerleiste. Die Bühne bleibt immer schwarz (Logo-Look), nur die Leiste folgt dem Thema. */
+:root{
+  --stage:#000;
+  --bg:#0b0908;
+  --fg:#f3e9e2;
+  --muted:#a1938a;
+  --line:#2b2421;
+  --accent:#ff6a2b;
+  --accent-hi:#ffb27a;
+  --font-ui:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-num:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){--bg:#f4efec;--fg:#241a16;--muted:#6c5d55;--line:#d8cdc6;--accent:#d8480f;--accent-hi:#a8350a;color-scheme:light}
+}
+:root[data-theme="light"]{--bg:#f4efec;--fg:#241a16;--muted:#6c5d55;--line:#d8cdc6;--accent:#d8480f;--accent-hi:#a8350a;color-scheme:light}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:12px;min-height:100%;justify-content:center}
+.stage{position:relative;width:100%;aspect-ratio:16/9;background:var(--stage);border:1px solid var(--line);overflow:hidden}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;font-size:15px;letter-spacing:.04em}
+.bar button,.bar label.btn{font:inherit;letter-spacing:.06em;text-transform:uppercase;color:var(--fg);background:transparent;border:1px solid var(--line);padding:7px 14px;cursor:pointer;min-height:36px}
+.bar button:hover,.bar label.btn:hover{border-color:var(--accent);color:var(--accent-hi)}
+.bar button:focus-visible,.bar label.btn:focus-within,.bar input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bar input[type=range]{flex:1 1 220px;min-width:140px;accent-color:var(--accent);height:24px}
+.bar .time{font-family:var(--font-num);font-size:13px;color:var(--muted);min-width:9.5ch;font-variant-numeric:tabular-nums}
+.bar .chk{display:flex;align-items:center;gap:6px;color:var(--muted);text-transform:uppercase;font-size:13px}
+.bar .chk input{accent-color:var(--accent)}
+.hint{font-size:13px;color:var(--muted);letter-spacing:.03em;min-width:0}
+.hint kbd{font-family:var(--font-num);font-size:12px;border:1px solid var(--line);padding:0 5px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=JetBrains+Mono:wght@400&display=swap">
+
+<div class="wrap">
+  <div class="stage" id="stage">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Leuchtende EKG-Linie zeichnet den Schriftzug skyK(A)i">
+      <defs>
+        <pattern id="gridS" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#ff7a3c" stroke-opacity=".055" stroke-width="1"/></pattern>
+        <pattern id="gridL" width="200" height="200" patternUnits="userSpaceOnUse"><path d="M200 0H0V200" fill="none" stroke="#ff7a3c" stroke-opacity=".09" stroke-width="1.2"/></pattern>
+        <radialGradient id="vig" cx="50%" cy="52%" r="75%"><stop offset="55%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".85"/></radialGradient>
+        <radialGradient id="amb" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff5a24" stop-opacity=".30"/><stop offset="55%" stop-color="#ff4a1a" stop-opacity=".10"/><stop offset="100%" stop-color="#ff4a1a" stop-opacity="0"/></radialGradient>
+        <radialGradient id="headG"><stop offset="0%" stop-color="#fffaf0"/><stop offset="30%" stop-color="#ffd9a8"/><stop offset="65%" stop-color="#ff7a30" stop-opacity=".55"/><stop offset="100%" stop-color="#ff4a1a" stop-opacity="0"/></radialGradient>
+        <filter id="glow" filterUnits="userSpaceOnUse" x="-100" y="-100" width="2120" height="1280" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b2"/>
+          <feMerge><feMergeNode in="b1"/><feMergeNode in="b1"/><feMergeNode in="b2"/></feMerge>
+        </filter>
+        <linearGradient id="reflFade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <mask id="reflMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><rect id="reflRect" x="0" y="0" width="1920" height="1080" fill="url(#reflFade)"/></mask>
+      </defs>
+
+      <rect width="1920" height="1080" fill="#000"/>
+      <rect width="1920" height="1080" fill="url(#gridS)"/>
+      <rect width="1920" height="1080" fill="url(#gridL)"/>
+      <ellipse id="ambient" cx="960" cy="540" rx="900" ry="420" fill="url(#amb)" opacity="0"/>
+      <line id="baseline" x1="0" x2="1920" stroke="#ff6a2b" stroke-opacity=".16" stroke-width="2"/>
+
+      <g id="reflWrap" mask="url(#reflMask)" opacity=".30"><g id="reflInner"><use href="#neon"/></g></g>
+      <g id="neon">
+        <g id="gGlow" filter="url(#glow)"></g>
+        <g id="gBody"></g>
+        <g id="gCore"></g>
+        <g id="gTip"></g>
+        <circle id="dotGlow" r="26" fill="#ff5a24" opacity="0" filter="url(#glow)"/>
+        <circle id="dot" r="10" fill="#ff7a35" opacity="0"/>
+        <circle id="dotCore" r="5" fill="#ffe2bd" opacity="0"/>
+        <circle id="head" r="34" fill="url(#headG)" opacity="0"/>
+      </g>
+      <rect width="1920" height="1080" fill="url(#vig)" pointer-events="none"/>
+    </svg>
+  </div>
+
+  <div class="bar">
+    <button id="play" type="button" aria-label="Abspielen oder pausieren">Pause</button>
+    <button id="restart" type="button">Neustart</button>
+    <label class="sr" for="seek">Zeitpunkt</label>
+    <input id="seek" type="range" min="0" max="16" step="0.01" value="0">
+    <span class="time" id="time">0.00 / 16.00 s</span>
+    <label class="chk" for="loop"><input id="loop" type="checkbox" checked> Loop</label>
+    <label class="btn" for="audioIn">Musik laden<input id="audioIn" class="sr" type="file" accept="audio/*"></label>
+    <button id="full" type="button">Vollbild</button>
+  </div>
+  <div class="hint"><kbd>Leertaste</kbd> Play/Pause · <kbd>←</kbd> <kbd>→</kbd> ±0,5 s · <kbd>R</kbd> Neustart · 16 s · 16:9 · die Zeitachse steht oben im Skript (<code>PLAN</code>)</div>
+  <audio id="audio" preload="auto"></audio>
+</div>
+
+<script>
+(() => {
+'use strict';
+const W = 1920, H = 1080, B = 630, SC = 1.68, DURATION = 16;
+const NS = 'http://www.w3.org/2000/svg';
+
+/* ---------- Zeitplan (Sekunden) ---------- */
+const PLAN = {
+  lead: 1.1,            // EKG-Vorlauf
+  leadConn: 0.22,
+  letters: { s: 1.15, k: 1.3, y: 1.4, K: 1.4, '(': 1.0, A: 1.5, ')': 1.0, i: 1.1 },
+  conns:   { s: 0.18, k: 0.18, y: 0.18, K: 0.18, '(': 0.16, A: 0.16, ')': 0.18 },
+  exit: 1.1,            // EKG-Auslauf
+  eraseStart: 14.3, eraseEnd: 15.7,
+};
+const LOOK = {
+  glow: '#ff3d12', body: '#ff6a2b', core: '#ffd2a0', tip: '#fff3dc',
+  ecgW: 5, letterW: 6.5, connW: 3, connRest: 0.2, tipLen: 150,
+};
+
+/* ---------- Buchstaben als Mittellinien (x rechts, y hoch = negativ, Grundlinie 0) ---------- */
+const GLYPH = {
+  s:  { adv: 66,  gap: 24, c: [['M',60,-82],['C',48,-102,8,-104,6,-78],['C',4,-54,60,-56,62,-26],['C',64,2,16,8,2,-14]] },
+  k:  { adv: 70,  gap: 22, c: [['M',10,0],['L',10,-172],['L',10,-44],['L',56,-102],['L',16,-52],['C',30,-40,52,-18,66,0]] },
+  y:  { adv: 66,  gap: 26, c: [['M',2,52],['C',28,66,58,48,58,6],['L',58,-100],['L',58,-40],['C',58,-16,50,-12,38,-12],['C',16,-12,6,-52,6,-100]] },
+  K:  { adv: 90,  gap: 22, c: [['M',10,0],['L',10,-150],['L',10,-72],['L',84,-150],['L',24,-87],['L',88,0]] },
+  '(':{ adv: 32,  gap: 8,  c: [['M',30,-176],['C',-2,-120,-2,-40,30,22]] },
+  A:  { adv: 104, gap: 8,  c: [['M',2,0],['L',52,-152],['L',85.5,-50],['L',18.4,-50],['L',85.5,-50],['L',102,0]] },
+  ')':{ adv: 32,  gap: 10, c: [['M',2,-176],['C',34,-120,34,-40,2,22]] },
+  i:  { adv: 40,  gap: 0,  c: [['M',10,0],['L',10,-100],['L',10,-6],['C',10,6,24,8,38,-4]] },
+};
+const ORDER = ['s','k','y','K','(','A',')','i'];
+
+/* ---------- Geometrie bauen ---------- */
+const f1 = n => n.toFixed(1);
+const toD = cmds => cmds.map(c => c[0] + c.slice(1).map(f1).join(' ')).join(' ');
+const startPt = cmds => ({ x: cmds[0][1], y: cmds[0][2] });
+const endPt = cmds => { const c = cmds[cmds.length-1]; return { x: c[c.length-2], y: c[c.length-1] }; };
+const place = (cmds, ox) => cmds.map(c => [c[0], ...c.slice(1).map((n, i) => i % 2 === 0 ? ox + n*SC : B + n*SC)]);
+
+function beat(x, w) {
+  const f = w/215;
+  return [['L',x+20*f,B],['Q',x+35*f,B-26,x+50*f,B],['L',x+72*f,B],['L',x+80*f,B+16],['L',x+98*f,B-190],['L',x+116*f,B+60],['L',x+127*f,B],['L',x+150*f,B],['Q',x+178*f,B-52,x+205*f,B],['L',x+215*f,B]];
+}
+function connector(a, b) {
+  const h = Math.max(28, (b.x - a.x) * 0.45);
+  return [['M',a.x,a.y],['C',a.x+h,a.y,b.x-h,b.y,b.x,b.y]];
+}
+
+const totalUnits = ORDER.reduce((s,k) => s + GLYPH[k].adv + GLYPH[k].gap, 0);
+const x0 = (W - totalUnits*SC) / 2;
+
+const segs = [];   // {kind,name,cmds,dur,len,off,t0,t1}
+function addSeg(kind, name, cmds, dur) { segs.push({ kind, name, cmds, dur }); }
+
+// Vorlauf: zwei Herzschläge
+const LB = 150;
+let lead = [['M',-60,B],['L',20,B], ...beat(20,LB), ['L',20+LB+18,B], ...beat(20+LB+18,LB)];
+const leadEnd = endPt(lead);
+addSeg('ecg', 'lead', lead, PLAN.lead);
+
+// Buchstaben + Verbinder
+let cx = x0, prevEnd = leadEnd, nextConn = PLAN.leadConn, lastEnd = null;
+ORDER.forEach(ch => {
+  const g = GLYPH[ch], cmds = place(g.c, cx);
+  addSeg('conn', 'to-' + ch, connector(prevEnd, startPt(cmds)), nextConn);
+  addSeg('letter', ch, cmds, PLAN.letters[ch]);
+  prevEnd = endPt(cmds); nextConn = PLAN.conns[ch];
+  g.ox = cx; cx += (g.adv + g.gap) * SC;
+});
+lastEnd = prevEnd;
+
+// Auslauf: EKG läuft rechts aus dem Bild
+const ex = lastEnd.x;
+const exitCmds = [['M',lastEnd.x,lastEnd.y],['C',ex+10,lastEnd.y+6,ex+14,B,ex+26,B], ...beat(ex+26,LB), ['L',ex+26+LB+18,B], ...beat(ex+26+LB+18,LB), ['L',W+80,B]];
+addSeg('ecg', 'exit', exitCmds, PLAN.exit);
+
+/* ---------- SVG-Elemente + Zeitachse ---------- */
+const $ = id => document.getElementById(id);
+const gGlow = $('gGlow'), gBody = $('gBody'), gCore = $('gCore'), gTip = $('gTip');
+const mk = (parent, d, stroke, w) => {
+  const p = document.createElementNS(NS, 'path');
+  p.setAttribute('d', d); p.setAttribute('fill', 'none'); p.setAttribute('stroke', stroke);
+  p.setAttribute('stroke-width', w); p.setAttribute('stroke-linecap', 'round'); p.setAttribute('stroke-linejoin', 'round');
+  parent.appendChild(p); return p;
+};
+let T = 0, OFF = 0;
+segs.forEach(s => {
+  const d = toD(s.cmds);
+  const w = s.kind === 'letter' ? LOOK.letterW : s.kind === 'conn' ? LOOK.connW : LOOK.ecgW;
+  s.pBody = mk(gBody, d, LOOK.body, w);
+  s.len = s.pBody.getTotalLength();
+  s.pGlow = mk(gGlow, d, LOOK.glow, w * 1.6);
+  s.pCore = mk(gCore, d, LOOK.core, Math.max(1.4, w * 0.36));
+  s.pTip  = mk(gTip, d, LOOK.tip, Math.max(2, w * 0.5));
+  s.off = OFF; OFF += s.len;
+  s.t0 = T; T += s.dur; s.t1 = T;
+});
+const TOTAL_LEN = OFF, T_DRAW_END = T;
+const T_LETTERS_DONE = segs.find(s => s.name === 'i').t1;
+
+const ease = (s, u) => s.kind === 'ecg' ? u : (u * 0.55 + (u*u*(3-2*u)) * 0.45);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+function localInv(s, target) { // u mit ease(u)=target
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 28; i++) { const m = (lo+hi)/2; (ease(s, m) < target) ? lo = m : hi = m; }
+  return (lo+hi)/2;
+}
+
+// i-Punkt: erscheint, sobald der Stift die Oberkante der i-Haste erreicht
+const segI = segs.find(s => s.name === 'i');
+const gi = GLYPH.i;
+const dotX = gi.ox + 10*SC, dotY = B - 134*SC;
+const topLen = 100 * SC;
+const T_DOT = segI.t0 + segI.dur * localInv(segI, topLen / segI.len);
+
+// Herzschlag-Impulse: R-Zacken von Vorlauf und Auslauf + Halte-Phase
+const PULSES = [];
+segs.filter(s => s.kind === 'ecg').forEach(s => {
+  let best = null; const step = 2;
+  for (let l = 0; l <= s.len; l += step) {
+    const p = s.pBody.getPointAtLength(l);
+    if (p.y < B - 120) { if (!best || p.y < best.y) best = { y: p.y, l }; }
+    else if (best) { PULSES.push(s.t0 + s.dur * localInv(s, best.l / s.len)); best = null; }
+  }
+});
+for (let t = T_DRAW_END + 0.3; t < PLAN.eraseStart; t += 0.82) PULSES.push(t);
+PULSES.sort((a,b) => a-b);
+const pulseAt = t => PULSES.reduce((a, tp) => t >= tp ? a + Math.exp(-(t - tp) / 0.2) : a, 0);
+
+/* ---------- Rendern (reine Funktion der Zeit) ---------- */
+const headEl = $('head'), dotEl = $('dot'), dotG = $('dotGlow'), dotC = $('dotCore'), amb = $('ambient');
+const base = $('baseline');
+base.setAttribute('y1', B); base.setAttribute('y2', B);
+$('reflInner').setAttribute('transform', `translate(0 ${(B+120)*1.42}) scale(1 -0.42)`);
+$('reflRect').setAttribute('y', B+120);
+$('reflRect').setAttribute('height', 300);
+document.getElementById('reflFade').setAttribute('y1', B+120);
+document.getElementById('reflFade').setAttribute('y2', B+330);
+amb.setAttribute('cx', W/2); amb.setAttribute('cy', B - 90);
+
+function headDist(t) {
+  let d = 0;
+  for (const s of segs) {
+    if (t >= s.t1) { d = s.off + s.len; continue; }
+    if (t > s.t0) d = s.off + s.len * ease(s, (t - s.t0) / s.dur);
+    break;
+  }
+  return d;
+}
+function render(t) {
+  t = clamp(t, 0, DURATION);
+  const head = headDist(t);
+  const eu = clamp((t - PLAN.eraseStart) / (PLAN.eraseEnd - PLAN.eraseStart), 0, 1);
+  const tail = TOTAL_LEN * (eu*eu*(3-2*eu));
+  const pulse = pulseAt(t);
+  const drawing = t < T_DRAW_END && head > 0;
+
+  segs.forEach(s => {
+    const lo = Math.max(0, tail - s.off), hi = Math.min(s.len, head - s.off);
+    const vis = hi - lo > 0.4;
+    let op = 1;
+    if (s.kind === 'conn') {
+      const k = clamp((t - s.t1 - 0.3) / 1.0, 0, 1);
+      op = 1 - k * (1 - LOOK.connRest);
+    }
+    const disp = vis ? '' : 'none';
+    for (const p of [s.pGlow, s.pBody, s.pCore]) {
+      p.style.display = disp;
+      if (vis) { p.setAttribute('stroke-dasharray', `${(hi-lo).toFixed(2)} ${(s.len*2+20).toFixed(0)}`); p.setAttribute('stroke-dashoffset', (-lo).toFixed(2)); p.setAttribute('opacity', op); }
+    }
+    // heisse Spitze nur am Stift
+    const inHead = drawing && head - s.off > 0 && head - s.off <= s.len + 0.01 && vis;
+    s.pTip.style.display = inHead ? '' : 'none';
+    if (inHead) {
+      const tl = Math.max(lo, hi - LOOK.tipLen);
+      s.pTip.setAttribute('stroke-dasharray', `${(hi-tl).toFixed(2)} ${(s.len*2+20).toFixed(0)}`);
+      s.pTip.setAttribute('stroke-dashoffset', (-tl).toFixed(2));
+    }
+  });
+
+  // Stiftkopf
+  if (drawing) {
+    const s = segs.find(q => head >= q.off && head <= q.off + q.len + 0.001) || segs[segs.length-1];
+    const p = s.pBody.getPointAtLength(clamp(head - s.off, 0, s.len));
+    headEl.setAttribute('cx', p.x); headEl.setAttribute('cy', p.y);
+    headEl.setAttribute('opacity', clamp((T_DRAW_END - t) / 0.12, 0, 1));
+  } else headEl.setAttribute('opacity', 0);
+
+  // i-Punkt
+  const dotGone = tail > segI.off + 8;
+  if (t >= T_DOT && !dotGone) {
+    const a = t - T_DOT, grow = a < 0.3 ? (1 - Math.pow(1 - a/0.3, 3)) * 1.18 : 1.18 - Math.min(0.18, (a-0.3)*0.5);
+    const flash = Math.exp(-a / 0.35);
+    for (const el of [dotEl, dotG, dotC]) { el.setAttribute('cx', dotX); el.setAttribute('cy', dotY); }
+    dotEl.setAttribute('r', (10*grow).toFixed(2)); dotC.setAttribute('r', (5*grow).toFixed(2)); dotG.setAttribute('r', (26*grow*(1+flash*0.8)).toFixed(2));
+    dotEl.setAttribute('opacity', 1); dotC.setAttribute('opacity', 1); dotG.setAttribute('opacity', clamp(0.8 + flash, 0, 1));
+  } else { dotEl.setAttribute('opacity', 0); dotC.setAttribute('opacity', 0); dotG.setAttribute('opacity', 0); }
+
+  // Glow-Atem + Raumlicht
+  $('gGlow').setAttribute('opacity', clamp(0.78 + 0.32 * pulse, 0, 1));
+  const prog = clamp(head / TOTAL_LEN, 0, 1) * (1 - eu);
+  amb.setAttribute('opacity', clamp(0.12 + 0.55 * prog + 0.25 * pulse * (1 - eu), 0, 1));
+}
+
+/* ---------- Player ---------- */
+const playBtn = $('play'), seek = $('seek'), timeEl = $('time'), loopEl = $('loop'), audio = $('audio');
+let playing = true, t = 0, last = performance.now();
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let hasAudio = false;
+function show() { render(t); seek.value = t; timeEl.textContent = t.toFixed(2) + ' / ' + DURATION.toFixed(2) + ' s'; }
+function setPlaying(p) {
+  playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; last = performance.now();
+  if (hasAudio) { if (p) { audio.currentTime = t; audio.play().catch(()=>{}); } else audio.pause(); }
+}
+function seekTo(v) { t = clamp(v, 0, DURATION); if (hasAudio) audio.currentTime = t; show(); }
+function tick(now) {
+  if (playing) {
+    t += (now - last) / 1000;
+    if (t >= DURATION) { if (loopEl.checked) { t -= DURATION; if (hasAudio) { audio.currentTime = t; } } else { t = DURATION; setPlaying(false); } }
+  }
+  last = now; show(); requestAnimationFrame(tick);
+}
+playBtn.addEventListener('click', () => { if (!playing && t >= DURATION) t = 0; setPlaying(!playing); });
+$('restart').addEventListener('click', () => { seekTo(0); setPlaying(true); });
+seek.addEventListener('input', () => seekTo(parseFloat(seek.value)));
+$('full').addEventListener('click', () => { const st = $('stage'); (st.requestFullscreen ? st.requestFullscreen() : Promise.reject()).catch(() => {}); });
+$('audioIn').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  audio.src = URL.createObjectURL(f); hasAudio = true; audio.loop = false; audio.currentTime = t; if (playing) audio.play().catch(()=>{});
+});
+addEventListener('keydown', e => {
+  if (e.target && /INPUT|BUTTON/.test(e.target.tagName) && e.code !== 'Space') { if (!['ArrowLeft','ArrowRight'].includes(e.code)) return; if (e.target.type === 'range') return; }
+  if (e.code === 'Space') { e.preventDefault(); if (e.target.tagName === 'BUTTON') return; setPlaying(!playing); }
+  else if (e.code === 'ArrowLeft') seekTo(t - 0.5);
+  else if (e.code === 'ArrowRight') seekTo(t + 0.5);
+  else if (e.code === 'KeyR') { seekTo(0); setPlaying(true); }
+});
+
+window.skykai = { render, DURATION, PLAN, segs, TOTAL_LEN, T_DOT, T_LETTERS_DONE, setTime: v => { playing = false; t = v; show(); } };
+console.log('Zeitachse', segs.map(s => `${s.name}:${s.t0.toFixed(2)}-${s.t1.toFixed(2)}`).join(' '), '| Zeichnung endet', T_DRAW_END.toFixed(2));
+if (reduce) { playing = false; t = T_LETTERS_DONE + 0.3; playBtn.textContent = 'Play'; }
+show(); requestAnimationFrame(tick);
+})();
+</script>
+
+</body></html>
