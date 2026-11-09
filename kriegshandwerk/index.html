@@ -36,10 +36,21 @@ const BT = {
   hall:    {name:'Rathaus',    hp:1500, size:96, supply:10, trains:['peasant']},
   orchall: {name:'Orkfestung', hp:1500, size:96, supply:10, trains:['grunt']},
   barracks:{name:'Kaserne',    hp:900,  size:72, cost:[160,60], time:30, trains:['footman']},
+  tower:   {name:'Wachturm',   hp:700,  size:44, cost:[120,80], time:25, atk:{dmg:16, rng:230, cd:1.2}},
   farm:    {name:'Farm',       hp:400,  size:44, cost:[80,20],  time:15, supply:6},
 };
 
 let S, cam = {x:0, y:0};
+let actx = null;
+function beep(f, d = .12, type = 'square', v = .05){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), a = actx.createGain();
+    o.type = type; o.frequency.value = f; a.gain.value = v;
+    a.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + d);
+    o.connect(a); a.connect(actx.destination); o.start(); o.stop(actx.currentTime + d);
+  } catch (e) {}
+}
 const mouse = {x:0, y:0, down:false, sx:0, sy:0, drag:false, inside:false, hud:false};
 const keys = {};
 let ground;
@@ -47,7 +58,7 @@ let ground;
 // ---------- Spielstart ----------
 function newGame(){
   S = {t:0, units:[], blds:[], mines:[], trees:[], sel:[], gold:500, lumber:200,
-       over:null, paused:false, place:null, amode:false, fx:[], nid:1, msg:'', msgT:0,
+       over:null, paused:false, groups:{}, lastClick:{t:0,e:null}, place:null, amode:false, fx:[], nid:1, msg:'', msgT:0,
        ai:{gold:300, tm:0, wave:0, chk:0, next:80}};
   S.mines.push({k:'r', kind:'mine', x:420,  y:380,  size:60, amt:3000});
   S.mines.push({k:'r', kind:'mine', x:1580, y:1120, size:60, amt:3000});
@@ -225,7 +236,7 @@ function step(u, dt){
         u.ang = Math.atan2(b.y - u.y, b.x - u.x);
         if (b.prog >= bt.time){
           b.done = true; b.hp = b.mhp; u.order = null;
-          if (b.team === 0) say(bt.name + ' fertiggestellt');
+          if (b.team === 0){ say(bt.name + ' fertiggestellt'); beep(660, .25, 'triangle', .08); }
         }
       } else go(u, b.x, b.y, dt, 0);
       break;
@@ -291,8 +302,18 @@ function update(dt){
       b.tp = 0;
       const ty = b.queue.shift();
       const u = addUnit(ty, b.team, b.x + rnd(-24, 24), b.y + b.size / 2 + 20);
-      if (b.rally) u.order = {t:'move', x:b.rally.x + rnd(-20, 20), y:b.rally.y + rnd(-20, 20)};
+      if (b.team === 0) beep(440, .1, 'triangle', .06);
+      if (b.rally && b.rally.res && ty === 'peasant') u.order = {t:'gather', res:b.rally.res, ph:'to'};
+      else if (b.rally && !b.rally.res) u.order = {t:'move', x:b.rally.x + rnd(-20, 20), y:b.rally.y + rnd(-20, 20)};
     }
+  }
+  for (const b of S.blds){
+    const a = BT[b.type].atk; if (!a || !b.done) continue;
+    b.cd = (b.cd || 0) - dt; if (b.cd > 0) continue;
+    let tg = null, bd = a.rng;
+    for (const e of S.units){ if (e.team === b.team || e.hp <= 0) continue;
+      const d = Math.hypot(e.x - b.x, e.y - b.y); if (d < bd){ bd = d; tg = e; } }
+    if (tg){ tg.hp -= a.dmg; b.cd = a.cd; S.fx.push({x:tg.x, y:tg.y, t:.2, c:'#fff'}); if (b.team === 0) beep(900, .05, 'sawtooth', .03); }
   }
   for (const u of S.units) step(u, dt);
   physics();
@@ -340,7 +361,8 @@ function pickAt(x, y, withRes){
 function command(wx, wy){
   const sel = S.sel;
   if (sel.length === 1 && sel[0].k === 'b' && sel[0].team === 0){
-    if (BT[sel[0].type].trains){ sel[0].rally = {x:wx, y:wy}; S.fx.push({x:wx, y:wy, t:.6, c:'#6f6'}); }
+    if (BT[sel[0].type].trains){ sel[0].rally = {x:wx, y:wy}; S.fx.push({x:wx, y:wy, t:.6, c:'#6f6'});
+      const r = pickAt(wx, wy, true); if (r && r.k === 'r'){ sel[0].rally = {x:r.x, y:r.y, res:r}; } }
     return;
   }
   const mine = sel.filter(e => e.k === 'u' && e.team === 0);
@@ -410,6 +432,7 @@ function buttons(){
   const e = s[0];
   if (s.some(u => u.k === 'u' && u.type === 'peasant')){
     out.push({l:'Kaserne', key:'b', c:'160G 60H', ok:S.gold >= 160 && S.lumber >= 60, fn:() => startPlace('barracks')});
+    out.push({l:'Turm',    key:'t', c:'120G 80H', ok:S.gold >= 120 && S.lumber >= 80, fn:() => startPlace('tower')});
     out.push({l:'Farm',    key:'f', c:'80G 20H',  ok:S.gold >= 80 && S.lumber >= 20,   fn:() => startPlace('farm')});
   }
   if (s.some(u => u.k === 'u' && u.type !== 'peasant'))
@@ -482,9 +505,13 @@ addEventListener('mouseup', e => {
     if (box.length) S.sel = shift ? [...new Set(S.sel.concat(box))] : box;
   } else {
     const t = pickAt(mouse.x + cam.x, mouse.y + cam.y, false);
-    if (t) S.sel = shift && t.team === 0 ? [...new Set(S.sel.concat([t]))] : [t];
+    const now = performance.now();
+    if (t && t.k === 'u' && t.team === 0 && S.lastClick.e && S.lastClick.e.type === t.type && now - S.lastClick.t < 350){
+      S.sel = S.units.filter(u => u.team === 0 && u.type === t.type && u.x > cam.x && u.x < cam.x + VW && u.y > cam.y && u.y < cam.y + VH - HUD);
+    } else if (t) S.sel = shift && t.team === 0 ? [...new Set(S.sel.concat([t]))] : [t];
     else if (!shift) S.sel = [];
   }
+  S.lastClick = {t:performance.now(), e:S.sel.length === 1 ? S.sel[0] : null};
   mouse.drag = false;
 });
 addEventListener('keydown', e => {
@@ -492,6 +519,14 @@ addEventListener('keydown', e => {
   keys[k] = true;
   if (k === 'escape'){ S.place = null; S.amode = false; }
   if (k === 'p') S.paused = !S.paused;
+  if (/^[1-9]$/.test(k)){
+    if (e.ctrlKey || e.altKey || e.metaKey){ e.preventDefault(); S.groups[k] = S.sel.filter(x => x.k === 'u' && x.team === 0); say('Gruppe ' + k + ' gespeichert'); return; }
+    const gr = (S.groups[k] || []).filter(x => x.hp > 0);
+    if (gr.length){ S.sel = gr; const c = gr[0]; cam.x = c.x - VW / 2; cam.y = c.y - (VH - HUD) / 2; clampCam(); }
+    return;
+  }
+  if (k === '.'){ const p = S.units.filter(u => u.team === 0 && u.type === 'peasant' && !u.order);
+    if (p.length){ S.sel = [p[0]]; cam.x = p[0].x - VW / 2; cam.y = p[0].y - (VH - HUD) / 2; clampCam(); } else say('Keine untätigen Bauern'); return; }
   if (e.repeat) return;
   for (const b of buttons()) if (b.key === k && b.ok){ b.fn(); break; }
 });
@@ -536,7 +571,7 @@ function drawEnt(e){
       for (const [dx, dy] of [[-1,-1],[1,-1],[-1,1],[1,1]]) g.fillRect(x + dx * s / 2 - (dx > 0 ? 14 : 0), y + dy * s / 2 - (dy > 0 ? 14 : 0), 14, 14);
     }
     g.fillStyle = '#fff'; g.font = 'bold ' + Math.round(s / 2.2) + 'px Georgia'; g.textAlign = 'center';
-    g.fillText({hall:'R', orchall:'F', barracks:'K', farm:'⌂'}[e.type], x, y + s / 6);
+    g.fillText({hall:'R', orchall:'F', barracks:'K', farm:'⌂', tower:'T'}[e.type], x, y + s / 6);
     g.globalAlpha = 1;
     if (sel){ g.strokeStyle = '#4f4'; g.lineWidth = 2; g.strokeRect(x - s / 2 - 4, y - s / 2 - 4, s + 8, s + 8); }
     if (sel || e.hp < e.mhp) bar(x - s / 2, y - s / 2 - 12, s, e.hp / e.mhp, e.team ? '#e33' : '#3c3');
@@ -582,7 +617,7 @@ function draw(){
   if (S.msgT > 0){ g.fillStyle = '#fff'; g.font = '18px Georgia'; g.shadowColor = '#000'; g.shadowBlur = 4; g.fillText(S.msg, VW / 2, 80); g.shadowBlur = 0; }
   if (S.amode){ g.fillStyle = '#fc6'; g.font = '16px Georgia'; g.fillText('Angriffsbefehl: Ziel anklicken (Esc = abbrechen)', VW / 2, 110); }
   if (S.t < 20){ g.fillStyle = 'rgba(255,255,255,.85)'; g.font = '14px Georgia'; g.shadowColor = '#000'; g.shadowBlur = 3;
-    g.fillText('Ziehen/Linksklick: auswählen · Rechtsklick: Befehl (Bauern: Mine/Baum anklicken) · WASD: Kamera · P: Pause', VW / 2, 140); g.shadowBlur = 0; }
+    g.fillText('Ziehen/Linksklick: auswählen (Doppelklick: alle gleichen) · Rechtsklick: Befehl · WASD: Kamera · Strg+1-9: Gruppe · .: untätiger Bauer · P: Pause', VW / 2, 140); g.shadowBlur = 0; }
   if (S.paused){ g.fillStyle = '#fff'; g.font = '40px Georgia'; g.fillText('Pause', VW / 2, VH / 2 - 40); }
   if (S.over){
     g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, 0, VW, VH);
