@@ -45,39 +45,55 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);padding-inl
 
 <div class="wrap">
   <div class="stage" id="stage">
-    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Leuchtende EKG-Linie zeichnet den Schriftzug skyK(A)i">
+    <svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Leuchtende EKG-Linie zeichnet den Schriftzug skyK(A)i in Handschrift">
       <defs>
-        <pattern id="gridS" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#ff7a3c" stroke-opacity=".055" stroke-width="1"/></pattern>
-        <pattern id="gridL" width="200" height="200" patternUnits="userSpaceOnUse"><path d="M200 0H0V200" fill="none" stroke="#ff7a3c" stroke-opacity=".09" stroke-width="1.2"/></pattern>
-        <radialGradient id="vig" cx="50%" cy="52%" r="75%"><stop offset="55%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".85"/></radialGradient>
-        <radialGradient id="amb" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff5a24" stop-opacity=".30"/><stop offset="55%" stop-color="#ff4a1a" stop-opacity=".10"/><stop offset="100%" stop-color="#ff4a1a" stop-opacity="0"/></radialGradient>
-        <radialGradient id="headG"><stop offset="0%" stop-color="#fffaf0"/><stop offset="30%" stop-color="#ffd9a8"/><stop offset="65%" stop-color="#ff7a30" stop-opacity=".55"/><stop offset="100%" stop-color="#ff4a1a" stop-opacity="0"/></radialGradient>
+        <radialGradient id="bgGlow" cx="50%" cy="48%" r="70%"><stop offset="0%" stop-color="#1a0c07"/><stop offset="55%" stop-color="#090403"/><stop offset="100%" stop-color="#020101"/></radialGradient>
+        <radialGradient id="vig" cx="50%" cy="50%" r="72%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".8"/></radialGradient>
+        <radialGradient id="amb" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff6a30" stop-opacity=".22"/><stop offset="55%" stop-color="#ff4a1a" stop-opacity=".07"/><stop offset="100%" stop-color="#ff4a1a" stop-opacity="0"/></radialGradient>
+        <radialGradient id="bokeh"><stop offset="0%" stop-color="#ff7a3c" stop-opacity=".10"/><stop offset="100%" stop-color="#ff7a3c" stop-opacity="0"/></radialGradient>
+        <radialGradient id="headG"><stop offset="0%" stop-color="#fffaf0"/><stop offset="30%" stop-color="#ffe0b8"/><stop offset="65%" stop-color="#ff8a3a" stop-opacity=".55"/><stop offset="100%" stop-color="#ff4a1a" stop-opacity="0"/></radialGradient>
+        <linearGradient id="fadeL" gradientUnits="userSpaceOnUse" x1="-120" y1="0" x2="640" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".10"/><stop offset=".55" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient>
+        <linearGradient id="fadeR" gradientUnits="userSpaceOnUse" x1="1560" y1="0" x2="2000" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity=".12"/></linearGradient>
+        <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b0f0a"/><stop offset=".35" stop-color="#0c0605"/><stop offset="1" stop-color="#040202"/></linearGradient>
+        <linearGradient id="reflFade" gradientUnits="userSpaceOnUse" x1="0" y1="800" x2="0" y2="1080"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".55" stop-color="#fff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+        <mask id="reflMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><rect width="1920" height="1080" fill="url(#reflFade)"/></mask>
         <filter id="glow" filterUnits="userSpaceOnUse" x="-100" y="-100" width="2120" height="1280" color-interpolation-filters="sRGB">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b1"/>
-          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b2"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="b1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b2"/>
           <feMerge><feMergeNode in="b1"/><feMergeNode in="b1"/><feMergeNode in="b2"/></feMerge>
         </filter>
-        <linearGradient id="reflFade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-        <mask id="reflMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><rect id="reflRect" x="0" y="0" width="1920" height="1080" fill="url(#reflFade)"/></mask>
+        <filter id="wet" filterUnits="userSpaceOnUse" x="0" y="700" width="1920" height="380" color-interpolation-filters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.0035 0.05" numOctaves="2" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G" result="d"/>
+          <feGaussianBlur in="d" stdDeviation="3 14"/>
+        </filter>
+        <filter id="streak" filterUnits="userSpaceOnUse" x="0" y="780" width="1920" height="300">
+          <feTurbulence type="fractalNoise" baseFrequency="0.0009 0.08" numOctaves="2" seed="3" result="t"/>
+          <feColorMatrix in="t" type="matrix" values="0 0 0 0 1  0 0 0 0 .45  0 0 0 0 .2  0 0 0 1.5 -.55"/>
+        </filter>
       </defs>
 
-      <rect width="1920" height="1080" fill="#000"/>
-      <rect width="1920" height="1080" fill="url(#gridS)"/>
-      <rect width="1920" height="1080" fill="url(#gridL)"/>
-      <ellipse id="ambient" cx="960" cy="540" rx="900" ry="420" fill="url(#amb)" opacity="0"/>
-      <line id="baseline" x1="0" x2="1920" stroke="#ff6a2b" stroke-opacity=".16" stroke-width="2"/>
+      <rect width="1920" height="1080" fill="url(#bgGlow)"/>
+      <g id="bokehs"></g>
+      <ellipse id="ambient" cx="960" cy="520" rx="980" ry="440" fill="url(#amb)" opacity="0"/>
 
-      <g id="reflWrap" mask="url(#reflMask)" opacity=".30"><g id="reflInner"><use href="#neon"/></g></g>
+      <!-- nasser Boden -->
+      <rect id="floor" x="0" y="832" width="1920" height="248" fill="url(#floorG)"/>
+      <rect x="0" y="832" width="1920" height="248" filter="url(#streak)" opacity=".07"/>
+      <line x1="0" x2="1920" y1="832.5" y2="832.5" stroke="#ff8a4a" stroke-opacity=".10" stroke-width="1.5"/>
+      <g mask="url(#reflMask)" opacity=".62"><g filter="url(#wet)"><g id="reflInner"><use href="#neon"/></g></g></g>
+
       <g id="neon">
         <g id="gGlow" filter="url(#glow)"></g>
         <g id="gBody"></g>
         <g id="gCore"></g>
         <g id="gTip"></g>
-        <circle id="dotGlow" r="26" fill="#ff5a24" opacity="0" filter="url(#glow)"/>
-        <circle id="dot" r="10" fill="#ff7a35" opacity="0"/>
-        <circle id="dotCore" r="5" fill="#ffe2bd" opacity="0"/>
-        <circle id="head" r="34" fill="url(#headG)" opacity="0"/>
+        <circle id="dotGlow" r="30" fill="#ff7a38" opacity="0" filter="url(#glow)"/>
+        <circle id="dot" r="14" fill="#ffe4cc" opacity="0"/>
+        <circle id="dotCore" r="9" fill="#fffaf2" opacity="0"/>
+        <circle id="head" r="36" fill="url(#headG)" opacity="0"/>
       </g>
+      <g id="dust"></g>
       <rect width="1920" height="1080" fill="url(#vig)" pointer-events="none"/>
     </svg>
   </div>
@@ -92,88 +108,81 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);padding-inl
     <label class="btn" for="audioIn">Musik laden<input id="audioIn" class="sr" type="file" accept="audio/*"></label>
     <button id="full" type="button">Vollbild</button>
   </div>
-  <div class="hint"><kbd>Leertaste</kbd> Play/Pause · <kbd>←</kbd> <kbd>→</kbd> ±0,5 s · <kbd>R</kbd> Neustart · 16 s · 16:9 · die Zeitachse steht oben im Skript (<code>PLAN</code>)</div>
+  <div class="hint"><kbd>Leertaste</kbd> Play/Pause · <kbd>←</kbd> <kbd>→</kbd> ±0,5 s · <kbd>R</kbd> Neustart · 16 s · 16:9 · Zeitachse oben im Skript (<code>PLAN</code>)</div>
   <audio id="audio" preload="auto"></audio>
 </div>
 
 <script>
 (() => {
 'use strict';
-const W = 1920, H = 1080, B = 630, SC = 1.68, DURATION = 16;
+const W = 1920, H = 1080, DURATION = 16;
 const NS = 'http://www.w3.org/2000/svg';
+
+/* Handschrift-Mittellinien, abgenommen von deinem Logo-Reel (Referenz-Raum 2000x889). [x, y] oder [x, y, 1] für scharfe Ecken. */
+const D = {"ecgL":[[0,462],[200,462],[300,460],[361.9,458.0],[390.1,465.2],[403.7,467.0],[417.6,459.2],[433.1,434.5],[447.8,400.3],[457.5,378.1],[458.7,374.4,1],[468.1,454.5],[478.3,537.0,1],[489.1,500.7],[503.3,462.4],[515.5,448.7],[528.7,459.6],[551.0,481.3],[565.7,477.0],[579.6,468.1]],"s":[[579.6,468.1],[604.4,448.1],[624.5,431.6],[638.9,417.9],[652.2,404.3],[668.0,391.8],[684.2,383.6],[695.2,381.8],[698.7,386.8],[694.5,398.5],[683.4,416.9],[667.4,440.2],[648.9,464.4],[630.9,485.4],[618.5,501.2],[615.1,511.2],[620.3,514.9],[632.3,511.9],[648.3,501.7],[663.1,484.9],[674.2,465.8],[684.4,449.9],[697.9,437.7],[714.5,426.7]],"k":[[714.5,426.7],[732.3,412.7],[746.2,386.2],[759.6,348.4],[775.1,309.4],[791.6,276.3],[808.0,251.0],[823.9,233.5],[837.0,224.9],[844.8,226.6],[845.9,238.4],[840.1,258.1],[828.4,282.6],[813.1,309.7],[797.7,339.4],[783.2,369.1],[768.8,393.4],[754.7,411.6],[741.9,429.7],[730.4,451.2],[721.1,472.4],[714.2,489.5,1],[721.1,472.7],[731.1,451.8],[746.0,427.7],[765.9,404.1],[787.3,386.5],[803.5,379.7],[810.3,384.1],[807.8,398.1],[797.4,417.8],[781.4,437.9],[762.9,455.7,1],[780.5,461.6],[801.1,465.3],[824.9,465.1],[849.6,460.0]],"y":[[849.6,460.0],[864.3,450.4],[881.2,437.0],[899.2,419.7],[914.8,402.7],[925.2,390.4],[931.4,383.2,1],[922.6,419.3],[913.8,452.8],[903.8,485.1],[891.6,519.8],[877.1,557.1],[859.6,593.9],[838.8,628.2],[814.9,657.4],[789.4,676.8],[766.6,682.6],[751.4,674.0],[746.5,653.0],[752.5,624.1],[768.5,592.6],[791.9,561.8],[819.6,533.5],[849.5,508.2],[880.3,485.4],[913.6,462.4],[954.0,434.4],[1002.2,400.3]],"K":[[1002.2,400.3,1],[986.8,450.7],[972.5,500.1],[962.3,547.3,1],[972.5,500.1],[986.8,450.7],[1002.2,400.3,1],[1019.6,357.8],[1040.0,308.0],[1057.4,265.0,1],[1040.0,308.0],[1019.6,357.8],[1002.2,400.3,1],[1055.1,359.8],[1102.1,325.0],[1149.3,292.9],[1199.5,253.6,1],[1149.3,292.9],[1102.1,325.0],[1055.1,359.8],[1002.2,400.3,1],[1052.0,448.8],[1100.2,510.7],[1136.5,558.1]],"p1":[[1191.4,583.3],[1182.7,564.8],[1173.7,536.9],[1167.5,500.1],[1166.9,461.2],[1172.3,424.2],[1183.5,387.2],[1201.1,348.5],[1223.8,311.1],[1245.4,281.8],[1261.9,262.4]],"A":[[1345.8,297.7],[1310.7,345.3],[1277.2,398.1],[1244.0,446.6],[1216.1,495.1],[1206.6,514.0,1],[1244.0,446.6,1],[1220.1,441.3,1],[1244.0,446.6,1],[1299.8,428.9],[1343.5,426.4],[1367.1,421.6,1],[1343.5,426.4,1],[1339.6,469.8],[1340.3,508.9,1]],"p2":[[1364.2,572.6],[1390.7,532.2],[1415.0,484.7],[1432.4,430.6],[1438.5,371.4],[1432.8,310.7],[1419.3,253.2]],"i":[[1496.3,385.0],[1484.1,423.7],[1474.5,458.6],[1470.7,487.2],[1475.0,506.8],[1488.2,514.5],[1509.3,508.8],[1535.1,490.3],[1560.0,464.3],[1579.1,438.5],[1593.4,416.4,1],[1602.3,443.8],[1610.7,473.3,1],[1623.4,447.6],[1628.8,433.2,1],[1628.3,440.9],[1647.7,514.8,1],[1656.6,459.0],[1664.8,415.0,1],[1671.7,447.5],[1684.6,500.0,1],[1694.2,469.0],[1707.0,442.6],[1712.7,452.1],[1729,468],[1749.8,465.1],[1800,465],[2000,465]],"dot":[1516,315]};
+
+/* Abbildung Referenz -> Bühne */
+const SCL = 1.12, BASE = 545, RX = 1080, RY = 463;
+const mapPt = q => { const o = [(q[0] - RX) * SCL + W/2, (q[1] - RY) * SCL + BASE]; if (q[2]) o.push(1); return o; };
+const M = a => a.map(mapPt);
+const BL = BASE;   // Grundlinie des EKG
 
 /* ---------- Zeitplan (Sekunden) ---------- */
 const PLAN = {
-  lead: 1.1,            // EKG-Vorlauf
-  leadConn: 0.22,
-  letters: { s: 1.15, k: 1.3, y: 1.4, K: 1.4, '(': 1.0, A: 1.5, ')': 1.0, i: 1.1 },
-  conns:   { s: 0.18, k: 0.18, y: 0.18, K: 0.18, '(': 0.16, A: 0.16, ')': 0.18 },
-  exit: 1.1,            // EKG-Auslauf
+  dur: { ecgL: 1.0, s: 1.0, k: 1.5, y: 1.8, K: 2.0, c1: 0.15, p1: 0.8, c2: 0.1, A: 1.3, c3: 0.1, p2: 0.8, c4: 0.15, i: 1.0, ecgR: 0.9 },
   eraseStart: 14.3, eraseEnd: 15.7,
 };
 const LOOK = {
-  glow: '#ff3d12', body: '#ff6a2b', core: '#ffd2a0', tip: '#fff3dc',
-  ecgW: 5, letterW: 6.5, connW: 3, connRest: 0.2, tipLen: 150,
+  cream:  { glow: '#ff8a40', body: '#ffe6cf', core: '#fffaf3', w: 10 },
+  orange: { glow: '#ff3a12', body: '#ff8a63', core: '#ffd2bb', w: 10 },
+  ecg:    { glow: '#ff6a2b', body: '#ff8a4a', core: '#ffe0c2', w: 4.6 },
+  tip: '#fff6e8', connW: 3, connRest: 0.2, tipLen: 160,
 };
 
-/* ---------- Buchstaben als Mittellinien (x rechts, y hoch = negativ, Grundlinie 0) ---------- */
-const GLYPH = {
-  s:  { adv: 66,  gap: 24, c: [['M',60,-82],['C',48,-102,8,-104,6,-78],['C',4,-54,60,-56,62,-26],['C',64,2,16,8,2,-14]] },
-  k:  { adv: 70,  gap: 22, c: [['M',10,0],['L',10,-172],['L',10,-44],['L',56,-102],['L',16,-52],['C',30,-40,52,-18,66,0]] },
-  y:  { adv: 66,  gap: 26, c: [['M',2,52],['C',28,66,58,48,58,6],['L',58,-100],['L',58,-40],['C',58,-16,50,-12,38,-12],['C',16,-12,6,-52,6,-100]] },
-  K:  { adv: 90,  gap: 22, c: [['M',10,0],['L',10,-150],['L',10,-72],['L',84,-150],['L',24,-87],['L',88,0]] },
-  '(':{ adv: 32,  gap: 8,  c: [['M',30,-176],['C',-2,-120,-2,-40,30,22]] },
-  A:  { adv: 104, gap: 8,  c: [['M',2,0],['L',52,-152],['L',85.5,-50],['L',18.4,-50],['L',85.5,-50],['L',102,0]] },
-  ')':{ adv: 32,  gap: 10, c: [['M',2,-176],['C',34,-120,34,-40,2,22]] },
-  i:  { adv: 40,  gap: 0,  c: [['M',10,0],['L',10,-100],['L',10,-6],['C',10,6,24,8,38,-4]] },
+/* ---------- Spline durch Wegpunkte (keine Überschwinger, Ecken über 3. Wert) ---------- */
+function spline(pts) {
+  const n = pts.length;
+  const dir = i => {
+    if (pts[i][2]) return [0, 0];
+    const a = pts[Math.max(0, i-1)], b = pts[Math.min(n-1, i+1)];
+    const L = Math.hypot(b[0]-a[0], b[1]-a[1]) || 1;
+    return [(b[0]-a[0])/L, (b[1]-a[1])/L];
+  };
+  let s = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+  for (let i = 0; i < n-1; i++) {
+    const p = pts[i], q = pts[i+1], L = Math.hypot(q[0]-p[0], q[1]-p[1]) / 3, a = dir(i), b = dir(i+1);
+    s += ' C' + (p[0]+a[0]*L).toFixed(1) + ' ' + (p[1]+a[1]*L).toFixed(1) + ' ' + (q[0]-b[0]*L).toFixed(1) + ' ' + (q[1]-b[1]*L).toFixed(1) + ' ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1);
+  }
+  return s;
+}
+const connector = (a, b) => {
+  const h = Math.max(24, Math.hypot(b[0]-a[0], b[1]-a[1]) * 0.35);
+  return `M${a[0].toFixed(1)} ${a[1].toFixed(1)} C${(a[0]+h).toFixed(1)} ${a[1].toFixed(1)} ${(b[0]-h).toFixed(1)} ${b[1].toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
 };
-const ORDER = ['s','k','y','K','(','A',')','i'];
+const last = a => a[a.length-1], first = a => a[0];
 
-/* ---------- Geometrie bauen ---------- */
-const f1 = n => n.toFixed(1);
-const toD = cmds => cmds.map(c => c[0] + c.slice(1).map(f1).join(' ')).join(' ');
-const startPt = cmds => ({ x: cmds[0][1], y: cmds[0][2] });
-const endPt = cmds => { const c = cmds[cmds.length-1]; return { x: c[c.length-2], y: c[c.length-1] }; };
-const place = (cmds, ox) => cmds.map(c => [c[0], ...c.slice(1).map((n, i) => i % 2 === 0 ? ox + n*SC : B + n*SC)]);
+/* ---------- Segmente in Schreibreihenfolge ---------- */
+const P = {
+  ecgL: M(D.ecgL), s: M(D.s), k: M(D.k), y: M(D.y), K: M(D.K), p1: M(D.p1), A: M(D.A), p2: M(D.p2),
+  i: M(D.i.slice(0, 11)), ecgR: M(D.i.slice(10)),
+};
+const segs = [];
+const add = (name, kind, d, style, w, dur, grad) => segs.push({ name, kind, d, style, w, dur, grad });
+add('ecgL', 'ecg', spline(P.ecgL), LOOK.ecg, LOOK.ecg.w, PLAN.dur.ecgL, 'url(#fadeL)');
+add('s', 'letter', spline(P.s), LOOK.cream, LOOK.cream.w, PLAN.dur.s);
+add('k', 'letter', spline(P.k), LOOK.cream, LOOK.cream.w, PLAN.dur.k);
+add('y', 'letter', spline(P.y), LOOK.cream, LOOK.cream.w, PLAN.dur.y);
+add('K', 'letter', spline(P.K), LOOK.cream, LOOK.cream.w, PLAN.dur.K);
+add('c1', 'conn', connector(last(P.K), first(P.p1)), LOOK.orange, LOOK.connW, PLAN.dur.c1);
+add('p1', 'letter', spline(P.p1), LOOK.orange, LOOK.orange.w, PLAN.dur.p1);
+add('c2', 'conn', connector(last(P.p1), first(P.A)), LOOK.orange, LOOK.connW, PLAN.dur.c2);
+add('A', 'letter', spline(P.A), LOOK.orange, LOOK.orange.w, PLAN.dur.A);
+add('c3', 'conn', connector(last(P.A), first(P.p2)), LOOK.orange, LOOK.connW, PLAN.dur.c3);
+add('p2', 'letter', spline(P.p2), LOOK.orange, LOOK.orange.w, PLAN.dur.p2);
+add('c4', 'conn', connector(last(P.p2), first(P.i)), LOOK.cream, LOOK.connW, PLAN.dur.c4);
+add('i', 'letter', spline(P.i), LOOK.cream, LOOK.cream.w, PLAN.dur.i);
+add('ecgR', 'ecg', spline(P.ecgR), LOOK.ecg, LOOK.ecg.w, PLAN.dur.ecgR, 'url(#fadeR)');
 
-function beat(x, w) {
-  const f = w/215;
-  return [['L',x+20*f,B],['Q',x+35*f,B-26,x+50*f,B],['L',x+72*f,B],['L',x+80*f,B+16],['L',x+98*f,B-190],['L',x+116*f,B+60],['L',x+127*f,B],['L',x+150*f,B],['Q',x+178*f,B-52,x+205*f,B],['L',x+215*f,B]];
-}
-function connector(a, b) {
-  const h = Math.max(28, (b.x - a.x) * 0.45);
-  return [['M',a.x,a.y],['C',a.x+h,a.y,b.x-h,b.y,b.x,b.y]];
-}
-
-const totalUnits = ORDER.reduce((s,k) => s + GLYPH[k].adv + GLYPH[k].gap, 0);
-const x0 = (W - totalUnits*SC) / 2;
-
-const segs = [];   // {kind,name,cmds,dur,len,off,t0,t1}
-function addSeg(kind, name, cmds, dur) { segs.push({ kind, name, cmds, dur }); }
-
-// Vorlauf: zwei Herzschläge
-const LB = 150;
-let lead = [['M',-60,B],['L',20,B], ...beat(20,LB), ['L',20+LB+18,B], ...beat(20+LB+18,LB)];
-const leadEnd = endPt(lead);
-addSeg('ecg', 'lead', lead, PLAN.lead);
-
-// Buchstaben + Verbinder
-let cx = x0, prevEnd = leadEnd, nextConn = PLAN.leadConn, lastEnd = null;
-ORDER.forEach(ch => {
-  const g = GLYPH[ch], cmds = place(g.c, cx);
-  addSeg('conn', 'to-' + ch, connector(prevEnd, startPt(cmds)), nextConn);
-  addSeg('letter', ch, cmds, PLAN.letters[ch]);
-  prevEnd = endPt(cmds); nextConn = PLAN.conns[ch];
-  g.ox = cx; cx += (g.adv + g.gap) * SC;
-});
-lastEnd = prevEnd;
-
-// Auslauf: EKG läuft rechts aus dem Bild
-const ex = lastEnd.x;
-const exitCmds = [['M',lastEnd.x,lastEnd.y],['C',ex+10,lastEnd.y+6,ex+14,B,ex+26,B], ...beat(ex+26,LB), ['L',ex+26+LB+18,B], ...beat(ex+26+LB+18,LB), ['L',W+80,B]];
-addSeg('ecg', 'exit', exitCmds, PLAN.exit);
-
-/* ---------- SVG-Elemente + Zeitachse ---------- */
 const $ = id => document.getElementById(id);
 const gGlow = $('gGlow'), gBody = $('gBody'), gCore = $('gCore'), gTip = $('gTip');
 const mk = (parent, d, stroke, w) => {
@@ -184,58 +193,76 @@ const mk = (parent, d, stroke, w) => {
 };
 let T = 0, OFF = 0;
 segs.forEach(s => {
-  const d = toD(s.cmds);
-  const w = s.kind === 'letter' ? LOOK.letterW : s.kind === 'conn' ? LOOK.connW : LOOK.ecgW;
-  s.pBody = mk(gBody, d, LOOK.body, w);
+  const st = s.style;
+  s.pBody = mk(gBody, s.d, s.grad || st.body, s.w);
   s.len = s.pBody.getTotalLength();
-  s.pGlow = mk(gGlow, d, LOOK.glow, w * 1.6);
-  s.pCore = mk(gCore, d, LOOK.core, Math.max(1.4, w * 0.36));
-  s.pTip  = mk(gTip, d, LOOK.tip, Math.max(2, w * 0.5));
+  s.pGlow = mk(gGlow, s.d, s.grad ? st.glow : st.glow, s.w * 1.7);
+  s.pCore = mk(gCore, s.d, s.grad ? '#ffe9d0' : st.core, Math.max(1.4, s.w * 0.5));
+  s.pTip  = mk(gTip, s.d, LOOK.tip, Math.max(2, s.w * 0.5));
+  if (s.grad) { s.pGlow.setAttribute('stroke', st.glow); }
+  if (s.grad) { s.pBody.setAttribute('stroke', st.body); }
   s.off = OFF; OFF += s.len;
   s.t0 = T; T += s.dur; s.t1 = T;
 });
 const TOTAL_LEN = OFF, T_DRAW_END = T;
 const T_LETTERS_DONE = segs.find(s => s.name === 'i').t1;
-
-const ease = (s, u) => s.kind === 'ecg' ? u : (u * 0.55 + (u*u*(3-2*u)) * 0.45);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-function localInv(s, target) { // u mit ease(u)=target
-  let lo = 0, hi = 1;
-  for (let i = 0; i < 28; i++) { const m = (lo+hi)/2; (ease(s, m) < target) ? lo = m : hi = m; }
-  return (lo+hi)/2;
-}
+const ease = (s, u) => s.kind === 'ecg' ? u : (u * 0.6 + (u*u*(3-2*u)) * 0.4);
 
-// i-Punkt: erscheint, sobald der Stift die Oberkante der i-Haste erreicht
+/* EKG-Enden blenden über die Pfadfarbe aus: Verlauf als Deckkraft über eine Maske */
+const fadeMaskL = document.createElementNS(NS, 'mask'); fadeMaskL.setAttribute('id', 'mEcgL'); fadeMaskL.setAttribute('maskUnits', 'userSpaceOnUse'); fadeMaskL.setAttribute('x', '-200'); fadeMaskL.setAttribute('y', '0'); fadeMaskL.setAttribute('width', '2400'); fadeMaskL.setAttribute('height', '1080');
+fadeMaskL.innerHTML = '<rect x="-200" y="0" width="2400" height="1080" fill="url(#fadeL)"/>';
+const fadeMaskR = fadeMaskL.cloneNode(true); fadeMaskR.setAttribute('id', 'mEcgR'); fadeMaskR.firstChild.setAttribute('fill', 'url(#fadeR)');
+document.querySelector('defs').append(fadeMaskL, fadeMaskR);
+segs.forEach(s => { if (s.grad) { const m = s.name === 'ecgL' ? 'url(#mEcgL)' : 'url(#mEcgR)'; [s.pGlow, s.pBody, s.pCore].forEach(p => p.setAttribute('mask', m)); } });
+
+/* i-Punkt */
+const dotXY = mapPt(D.dot);
 const segI = segs.find(s => s.name === 'i');
-const gi = GLYPH.i;
-const dotX = gi.ox + 10*SC, dotY = B - 134*SC;
-const topLen = 100 * SC;
-const T_DOT = segI.t0 + segI.dur * localInv(segI, topLen / segI.len);
+const T_DOT = segI.t0 + 0.05;
 
-// Herzschlag-Impulse: R-Zacken von Vorlauf und Auslauf + Halte-Phase
+/* Herzschlag-Impulse: EKG-Zacken + Halte-Phase */
 const PULSES = [];
+const invT = (s, l) => { let lo = 0, hi = 1; for (let i = 0; i < 26; i++) { const m = (lo+hi)/2; (ease(s, m) < l / s.len) ? lo = m : hi = m; } return s.t0 + s.dur * (lo+hi)/2; };
 segs.filter(s => s.kind === 'ecg').forEach(s => {
-  let best = null; const step = 2;
-  for (let l = 0; l <= s.len; l += step) {
+  let best = null;
+  for (let l = 0; l <= s.len; l += 2) {
     const p = s.pBody.getPointAtLength(l);
-    if (p.y < B - 120) { if (!best || p.y < best.y) best = { y: p.y, l }; }
-    else if (best) { PULSES.push(s.t0 + s.dur * localInv(s, best.l / s.len)); best = null; }
+    if (p.y < BL - 50) { if (!best || p.y < best.y) best = { y: p.y, l }; }
+    else if (best) { PULSES.push(invT(s, best.l)); best = null; }
   }
 });
 for (let t = T_DRAW_END + 0.3; t < PLAN.eraseStart; t += 0.82) PULSES.push(t);
-PULSES.sort((a,b) => a-b);
+PULSES.sort((a, b) => a - b);
 const pulseAt = t => PULSES.reduce((a, tp) => t >= tp ? a + Math.exp(-(t - tp) / 0.2) : a, 0);
+
+/* ---------- Atmosphäre: Bokeh + Staub (periodisch, damit der Loop nahtlos bleibt) ---------- */
+const rnd = (() => { let s = 12345; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+const bokehs = [], dust = [];
+for (let i = 0; i < 7; i++) {
+  const c = document.createElementNS(NS, 'circle'); c.setAttribute('fill', 'url(#bokeh)'); $('bokehs').appendChild(c);
+  bokehs.push({ c, x: 150 + rnd()*1620, y: 120 + rnd()*800, r: 150 + rnd()*210, m: 1 + Math.floor(rnd()*2), ph: rnd()*6.283, amp: 30 + rnd()*40 });
+}
+for (let i = 0; i < 90; i++) {
+  const c = document.createElementNS(NS, 'circle'); c.setAttribute('fill', '#ffb888'); $('dust').appendChild(c);
+  dust.push({ c, x: rnd()*W, y: rnd()*(H-120), r: 0.7 + rnd()*1.8, mx: 1 + Math.floor(rnd()*3), my: 1 + Math.floor(rnd()*3), px: rnd()*6.283, py: rnd()*6.283, ax: 14 + rnd()*40, ay: 14 + rnd()*40, tw: 1 + Math.floor(rnd()*4), o: 0.15 + rnd()*0.5 });
+}
+const TAU = Math.PI * 2;
+function atmosphere(t) {
+  const u = t / DURATION * TAU;
+  bokehs.forEach(b => { b.c.setAttribute('cx', (b.x + Math.sin(u*b.m + b.ph) * b.amp).toFixed(1)); b.c.setAttribute('cy', (b.y + Math.cos(u*b.m + b.ph) * b.amp * 0.6).toFixed(1)); b.c.setAttribute('r', b.r.toFixed(0)); });
+  dust.forEach(d => {
+    d.c.setAttribute('cx', (d.x + Math.sin(u*d.mx + d.px) * d.ax).toFixed(1));
+    d.c.setAttribute('cy', (d.y + Math.sin(u*d.my + d.py) * d.ay).toFixed(1));
+    d.c.setAttribute('r', d.r.toFixed(2));
+    d.c.setAttribute('opacity', (d.o * (0.55 + 0.45 * Math.sin(u*d.tw + d.px))).toFixed(3));
+  });
+}
 
 /* ---------- Rendern (reine Funktion der Zeit) ---------- */
 const headEl = $('head'), dotEl = $('dot'), dotG = $('dotGlow'), dotC = $('dotCore'), amb = $('ambient');
-const base = $('baseline');
-base.setAttribute('y1', B); base.setAttribute('y2', B);
-$('reflInner').setAttribute('transform', `translate(0 ${(B+120)*1.42}) scale(1 -0.42)`);
-$('reflRect').setAttribute('y', B+120);
-$('reflRect').setAttribute('height', 300);
-document.getElementById('reflFade').setAttribute('y1', B+120);
-document.getElementById('reflFade').setAttribute('y2', B+330);
-amb.setAttribute('cx', W/2); amb.setAttribute('cy', B - 90);
+$('reflInner').setAttribute('transform', `translate(0 ${800 * 1.5}) scale(1 -0.5)`);
+amb.setAttribute('cx', W/2); amb.setAttribute('cy', BASE - 40);
 
 function headDist(t) {
   let d = 0;
@@ -248,6 +275,7 @@ function headDist(t) {
 }
 function render(t) {
   t = clamp(t, 0, DURATION);
+  atmosphere(t);
   const head = headDist(t);
   const eu = clamp((t - PLAN.eraseStart) / (PLAN.eraseEnd - PLAN.eraseStart), 0, 1);
   const tail = TOTAL_LEN * (eu*eu*(3-2*eu));
@@ -258,16 +286,12 @@ function render(t) {
     const lo = Math.max(0, tail - s.off), hi = Math.min(s.len, head - s.off);
     const vis = hi - lo > 0.4;
     let op = 1;
-    if (s.kind === 'conn') {
-      const k = clamp((t - s.t1 - 0.3) / 1.0, 0, 1);
-      op = 1 - k * (1 - LOOK.connRest);
-    }
+    if (s.kind === 'conn') { const k = clamp((t - s.t1 - 0.3) / 1.0, 0, 1); op = 1 - k * (1 - LOOK.connRest); }
     const disp = vis ? '' : 'none';
     for (const p of [s.pGlow, s.pBody, s.pCore]) {
       p.style.display = disp;
       if (vis) { p.setAttribute('stroke-dasharray', `${(hi-lo).toFixed(2)} ${(s.len*2+20).toFixed(0)}`); p.setAttribute('stroke-dashoffset', (-lo).toFixed(2)); p.setAttribute('opacity', op); }
     }
-    // heisse Spitze nur am Stift
     const inHead = drawing && head - s.off > 0 && head - s.off <= s.len + 0.01 && vis;
     s.pTip.style.display = inHead ? '' : 'none';
     if (inHead) {
@@ -277,7 +301,6 @@ function render(t) {
     }
   });
 
-  // Stiftkopf
   if (drawing) {
     const s = segs.find(q => head >= q.off && head <= q.off + q.len + 0.001) || segs[segs.length-1];
     const p = s.pBody.getPointAtLength(clamp(head - s.off, 0, s.len));
@@ -285,39 +308,37 @@ function render(t) {
     headEl.setAttribute('opacity', clamp((T_DRAW_END - t) / 0.12, 0, 1));
   } else headEl.setAttribute('opacity', 0);
 
-  // i-Punkt
   const dotGone = tail > segI.off + 8;
   if (t >= T_DOT && !dotGone) {
     const a = t - T_DOT, grow = a < 0.3 ? (1 - Math.pow(1 - a/0.3, 3)) * 1.18 : 1.18 - Math.min(0.18, (a-0.3)*0.5);
     const flash = Math.exp(-a / 0.35);
-    for (const el of [dotEl, dotG, dotC]) { el.setAttribute('cx', dotX); el.setAttribute('cy', dotY); }
-    dotEl.setAttribute('r', (10*grow).toFixed(2)); dotC.setAttribute('r', (5*grow).toFixed(2)); dotG.setAttribute('r', (26*grow*(1+flash*0.8)).toFixed(2));
-    dotEl.setAttribute('opacity', 1); dotC.setAttribute('opacity', 1); dotG.setAttribute('opacity', clamp(0.8 + flash, 0, 1));
+    for (const el of [dotEl, dotG, dotC]) { el.setAttribute('cx', dotXY[0]); el.setAttribute('cy', dotXY[1]); }
+    dotEl.setAttribute('r', (14*grow).toFixed(2)); dotC.setAttribute('r', (9*grow).toFixed(2)); dotG.setAttribute('r', (30*grow*(1+flash*0.8)).toFixed(2));
+    dotEl.setAttribute('opacity', 1); dotC.setAttribute('opacity', 1); dotG.setAttribute('opacity', clamp(0.75 + flash, 0, 1));
   } else { dotEl.setAttribute('opacity', 0); dotC.setAttribute('opacity', 0); dotG.setAttribute('opacity', 0); }
 
-  // Glow-Atem + Raumlicht
-  $('gGlow').setAttribute('opacity', clamp(0.78 + 0.32 * pulse, 0, 1));
+  gGlow.setAttribute('opacity', clamp(0.62 + 0.3 * pulse, 0, 1));
   const prog = clamp(head / TOTAL_LEN, 0, 1) * (1 - eu);
-  amb.setAttribute('opacity', clamp(0.12 + 0.55 * prog + 0.25 * pulse * (1 - eu), 0, 1));
+  amb.setAttribute('opacity', clamp(0.14 + 0.55 * prog + 0.25 * pulse * (1 - eu), 0, 1));
 }
 
 /* ---------- Player ---------- */
 const playBtn = $('play'), seek = $('seek'), timeEl = $('time'), loopEl = $('loop'), audio = $('audio');
-let playing = true, t = 0, last = performance.now();
+let playing = true, t = 0, lastNow = performance.now();
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let hasAudio = false;
 function show() { render(t); seek.value = t; timeEl.textContent = t.toFixed(2) + ' / ' + DURATION.toFixed(2) + ' s'; }
 function setPlaying(p) {
-  playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; last = performance.now();
+  playing = p; playBtn.textContent = p ? 'Pause' : 'Play'; lastNow = performance.now();
   if (hasAudio) { if (p) { audio.currentTime = t; audio.play().catch(()=>{}); } else audio.pause(); }
 }
 function seekTo(v) { t = clamp(v, 0, DURATION); if (hasAudio) audio.currentTime = t; show(); }
 function tick(now) {
   if (playing) {
-    t += (now - last) / 1000;
-    if (t >= DURATION) { if (loopEl.checked) { t -= DURATION; if (hasAudio) { audio.currentTime = t; } } else { t = DURATION; setPlaying(false); } }
+    t += (now - lastNow) / 1000;
+    if (t >= DURATION) { if (loopEl.checked) { t -= DURATION; if (hasAudio) audio.currentTime = t; } else { t = DURATION; setPlaying(false); } }
   }
-  last = now; show(); requestAnimationFrame(tick);
+  lastNow = now; show(); requestAnimationFrame(tick);
 }
 playBtn.addEventListener('click', () => { if (!playing && t >= DURATION) t = 0; setPlaying(!playing); });
 $('restart').addEventListener('click', () => { seekTo(0); setPlaying(true); });
@@ -336,7 +357,7 @@ addEventListener('keydown', e => {
 });
 
 window.skykai = { render, DURATION, PLAN, segs, TOTAL_LEN, T_DOT, T_LETTERS_DONE, setTime: v => { playing = false; t = v; show(); } };
-console.log('Zeitachse', segs.map(s => `${s.name}:${s.t0.toFixed(2)}-${s.t1.toFixed(2)}`).join(' '), '| Zeichnung endet', T_DRAW_END.toFixed(2));
+console.log('Zeitachse', segs.map(s => `${s.name}:${s.t0.toFixed(2)}-${s.t1.toFixed(2)}(${s.len.toFixed(0)}px)`).join(' '), '| Zeichnung endet', T_DRAW_END.toFixed(2));
 if (reduce) { playing = false; t = T_LETTERS_DONE + 0.3; playBtn.textContent = 'Play'; }
 show(); requestAnimationFrame(tick);
 })();
